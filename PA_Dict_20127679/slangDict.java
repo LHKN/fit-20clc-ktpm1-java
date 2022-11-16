@@ -19,9 +19,9 @@ public class slangDict {
             String line = reader.readLine();
             while(line!=null){
                 String[] splitLine = line.split("'");
-                //update dictionary here __ BUG currently
-                String word = String.valueOf(splitLine[0]);
-                dictionary.put(word,splitLine[1]); 
+                //update dictionary here 
+                String[] definition = splitLine[0].split(" ");
+                dictionary.put(splitLine[1], definition); 
                 line = reader.readLine();
             }
             reader.close();
