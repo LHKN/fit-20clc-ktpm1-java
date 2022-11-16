@@ -2,7 +2,6 @@ package PA_Dict_20127679;
 
 import java.util.*;
 import java.io.*;
-//import java.util.stream.*;
 
 public class slangDict {
     // private static Scanner input = new Scanner(System.in);
@@ -13,7 +12,23 @@ public class slangDict {
 
     //input file dict
     void inputDict(String filename){
-
+        dictionary.clear();
+        BufferedReader reader;
+        try{
+            reader = new BufferedReader(new FileReader(filename));
+            String line = reader.readLine();
+            while(line!=null){
+                String[] splitLine = line.split("'");
+                //update dictionary here __ BUG currently
+                String word = String.valueOf(splitLine[0]);
+                dictionary.put(word,splitLine[1]); 
+                line = reader.readLine();
+            }
+            reader.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     //output file dict
