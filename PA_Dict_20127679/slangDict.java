@@ -7,11 +7,10 @@ public class slangDict {
     // private static Scanner input = new Scanner(System.in);
     
     private HashMap<String,String[]> dictionary = new HashMap<>();
-    private HashMap<String,String[]> history = new HashMap<>();
-    //put defition as slangCard to make multiple duplicate slangs?
+    private HashMap<String,ArrayList<String[]>> history = new HashMap<>();
 
     //input file dict
-    void inputDict(String filename){
+    public void inputDict(String filename){
         dictionary.clear();
         BufferedReader reader;
         try{
@@ -32,7 +31,7 @@ public class slangDict {
     }
 
     //output file dict
-    void outputDict(String filename) throws IOException{
+    public void outputDict(String filename) throws IOException{
         String s;
         FileWriter fw;
         try{
@@ -54,26 +53,60 @@ public class slangDict {
         //need to save history?
 
     //search slang word
+    public void searchWord(String word){
+        for (String s:dictionary.keySet()){
+            if (word.equals(s)){
+                System.out.println(word+"'"+dictionary.get(word)+"/n");  
+            }
+        }
+    }
 
     //search definition
+    public void searchDefinition(String[] definition){
+
+    }
 
     //show search history 
-    
+    public void viewSearchHistory(){
+
+    }
+
     //add slang --> check condition: overwrite/duplicate
+    public void addSlang(){
+
+    }
 
     //edit slang
+    public void editSlang(){
+
+    }
 
     //delete slang --> need confirm
+    public void deleteSlang(){
+
+    }
 
     //reset slang list
+    public void resetDict(){
+
+    }
 
     //random slang (On this day slang word)
+    public void randomSlang(){
+
+    }
 
     //minigame: 1 slang 4 definition options
+    public void wordMinigame(){
+
+    }
 
     //minigame: 1 def 4 slang
+    public void definitionMinigame(){
 
-    //additional methods for support/debug
+    }
+
+        //additional methods for support/debug
     LinkedHashMap<String,String[]> sortedDict = new LinkedHashMap<>();
     class wordComparator implements Comparator<String>{
         public int compare(String s1, String s2){
