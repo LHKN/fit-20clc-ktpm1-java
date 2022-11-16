@@ -73,6 +73,7 @@ public class DApp{
                 }
                 case 12:
                 {
+                    sd.inputDict(slang.txt);
                     sd.viewDictConsole();
                     break;
                 }
