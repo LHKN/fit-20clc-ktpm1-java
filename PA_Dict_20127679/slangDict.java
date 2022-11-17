@@ -151,11 +151,14 @@ public class slangDict {
         for (String word:sortedDict.keySet()){
             String s=word+"`";
             ArrayList<String> a = dictionary.get(word);
-            for (String d : a){
-                s+=d+"| ";
+            if (a!=null){
+                for (String d : a){
+                    s+=d+"| ";
+                }
             }
             System.out.println(s);
         }
+        System.out.println();
     }
 
 }
