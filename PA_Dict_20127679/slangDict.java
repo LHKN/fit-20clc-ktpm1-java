@@ -6,8 +6,8 @@ import java.io.*;
 public class slangDict {
     // private static Scanner input = new Scanner(System.in);
     
-    private HashMap<String,String[]> dictionary = new HashMap<>();
-    private HashMap<String,ArrayList<String[]>> history = new HashMap<>();
+    private static HashMap<String,String[]> dictionary = new HashMap<>();
+    //private static HashMap<String,ArrayList<String[]>> history = new HashMap<>();
 
     //input file dict
     public void inputDict(String filename){
@@ -16,16 +16,15 @@ public class slangDict {
         try{
             reader = new BufferedReader(new FileReader(filename));
             String line = reader.readLine();
-            while(line!=null){
-                String[] splitLine = line.split("'");
-                //update dictionary here 
-                String[] definition = splitLine[0].split(" ");
-                dictionary.put(splitLine[1], definition); 
+            while (line!=null){
+                String[] splitLine = line.split("`");
+                    //update dictionary here 
+                String[] definition = splitLine[1].split("| ");
+                dictionary.put(splitLine[0], definition); 
                 line = reader.readLine();
             }
             reader.close();
-        }
-        catch(IOException e){
+        } catch(IOException e){
             e.printStackTrace();
         }
     }
@@ -43,7 +42,7 @@ public class slangDict {
             return;
         }
         for (String word:dictionary.keySet()){
-            s=word+"'"+dictionary.get(word)+"/n";
+            s=word+"`"+dictionary.get(word)+"/n";
             fw.write(s);
         }
         fw.close();

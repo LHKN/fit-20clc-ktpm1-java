@@ -7,6 +7,7 @@ public class DApp{
     //use swingUI/Console
     //draw cmd from slangDict
 
+    private static String filename = "slang.txt";
     //console
     public static void main(String args[]) throws IOException{
         Scanner input = new Scanner(System.in);
@@ -73,7 +74,9 @@ public class DApp{
                 }
                 case 12:
                 {
-                    sd.inputDict(slang.txt);
+                    // File myFile = new File(filename);
+                    // sd.inputDict(myFile.getCanonicalPath());
+                    sd.inputDict(filename);
                     sd.viewDictConsole();
                     break;
                 }
