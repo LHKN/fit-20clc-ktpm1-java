@@ -1,4 +1,4 @@
-package PA_Dict_20127679;
+//package PA_Dict_20127679;
 import java.io.*;
 import java.util.*;
 
@@ -74,8 +74,6 @@ public class DApp{
                 }
                 case 12:
                 {
-                    // File myFile = new File(filename);
-                    // sd.inputDict(myFile.getCanonicalPath());
                     sd.inputDict(filename);
                     sd.viewDictConsole();
                     break;

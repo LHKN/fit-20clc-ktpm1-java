@@ -1,4 +1,4 @@
-package PA_Dict_20127679;
+//package PA_Dict_20127679;
 
 import java.util.*;
 import java.io.*;
@@ -6,8 +6,8 @@ import java.io.*;
 public class slangDict {
     // private static Scanner input = new Scanner(System.in);
     
-    private static HashMap<String,String[]> dictionary = new HashMap<>();
-    //private static HashMap<String,ArrayList<String[]>> history = new HashMap<>();
+    private static HashMap<String,ArrayList<String>> dictionary = new HashMap<>();
+    //private static HashMap<String,ArrayList<String>> history = new HashMap<>();
 
     //input file dict
     public void inputDict(String filename){
@@ -19,7 +19,12 @@ public class slangDict {
             while (line!=null){
                 String[] splitLine = line.split("`");
                     //update dictionary here 
-                String[] definition = splitLine[1].split("| ");
+                String[] splitDefinition = null;
+                ArrayList<String> definition = null;
+                if (splitLine.length>1){
+                    splitDefinition = splitLine[1].split("\\| ");
+                    definition = new ArrayList<>(Arrays.asList(splitDefinition));
+                }
                 dictionary.put(splitLine[0], definition); 
                 line = reader.readLine();
             }
@@ -38,11 +43,15 @@ public class slangDict {
         }
         catch(IOException e){
             System.out.println("Error opening file");
-            //swingUI
             return;
         }
         for (String word:dictionary.keySet()){
-            s=word+"`"+dictionary.get(word)+"/n";
+            s=word+"`";
+            ArrayList<String> a = dictionary.get(word);
+            for (String d : a){
+                s+=d+"| ";
+            }
+            s+="\n";
             fw.write(s);
         }
         fw.close();
@@ -53,9 +62,14 @@ public class slangDict {
 
     //search slang word
     public void searchWord(String word){
-        for (String s:dictionary.keySet()){
-            if (word.equals(s)){
-                System.out.println(word+"'"+dictionary.get(word)+"/n");  
+        for (String str:dictionary.keySet()){
+            if (word.equals(str)){
+                String s=word+"`";
+                ArrayList<String> a = dictionary.get(word);
+                for (String d : a){
+                    s+=d+"| ";
+                }
+                System.out.println(s);  
             }
         }
     }
@@ -106,7 +120,7 @@ public class slangDict {
     }
 
         //additional methods for support/debug
-    LinkedHashMap<String,String[]> sortedDict = new LinkedHashMap<>();
+    LinkedHashMap<String,ArrayList<String>> sortedDict = new LinkedHashMap<>();
     class wordComparator implements Comparator<String>{
         public int compare(String s1, String s2){
             return s1.compareTo(s2);
@@ -135,7 +149,12 @@ public class slangDict {
     public void viewDictConsole(){
         sortWord();
         for (String word:sortedDict.keySet()){
-            System.out.println(word+"'"+sortedDict.get(word)+"/n");
+            String s=word+"`";
+            ArrayList<String> a = dictionary.get(word);
+            for (String d : a){
+                s+=d+"| ";
+            }
+            System.out.println(s);
         }
     }
 

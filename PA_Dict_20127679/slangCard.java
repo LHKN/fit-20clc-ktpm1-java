@@ -1,4 +1,4 @@
-package PA_Dict_20127679;
+//package PA_Dict_20127679;
 
 public class slangCard {
     private String word;
