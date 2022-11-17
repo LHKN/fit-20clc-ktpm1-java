@@ -9,6 +9,11 @@ public class slangDict {
     private static HashMap<String,ArrayList<String>> dictionary = new HashMap<>();
     //private static HashMap<String,ArrayList<String>> history = new HashMap<>();
 
+    public slangDict(){
+        inputDict("slang.txt");
+        viewDictConsole();
+    }
+
     //input file dict
     public void inputDict(String filename){
         dictionary.clear();
@@ -64,14 +69,16 @@ public class slangDict {
     public void searchWord(String word){
         for (String str:dictionary.keySet()){
             if (word.equals(str)){
-                String s=word+"`";
-                ArrayList<String> a = dictionary.get(word);
+                String s=str+"`";
+                ArrayList<String> a = dictionary.get(str);
                 for (String d : a){
                     s+=d+"| ";
                 }
-                System.out.println(s);  
+                System.out.println(s);
+                return;
             }
         }
+        System.out.println("This slang is not in dictionary (UmU)...");
     }
 
     //search definition

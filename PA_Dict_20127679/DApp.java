@@ -23,8 +23,8 @@ public class DApp{
             System.out.println("Enter 7 to delete a slang;");
             System.out.println("Enter 8 to reset slang list;");
             System.out.println("Enter 9 to randomize a slang (On this day slang word);");
-            System.out.println("Enter 10 to play minigame! Guess the definition of the slang;");
-            System.out.println("Enter 11 to play minigame! Guess the slang.");
+            System.out.println("Enter 10 to play minigame ( ._.)! Guess the definition of the slang;");
+            System.out.println("Enter 11 to play minigame (._. )! Guess the slang.");
 
             System.out.println("Enter 12 to view dictionary.");
 
@@ -40,7 +40,17 @@ public class DApp{
                 }
                 case 2:
                 {
+                    boolean check = true;
+                    while(check){
+                        System.out.print("Enter slang: ");
+                        String word = input.nextLine();
+                        word = input.nextLine();
+                        sd.searchWord(word);
 
+                        System.out.println("Enter another slang? Enter 1 for Yes, other numbers for No: ");
+                        int opt = input.nextInt();
+                        if (opt!=1) check=!check;
+                    }
                     break;
                 }
                 case 3:
@@ -69,6 +79,18 @@ public class DApp{
                     break;
                 }
                 case 8: 
+                {
+                    break;
+                }
+                case 9:
+                {
+                    break;
+                }
+                case 10:
+                {
+                    break;
+                }
+                case 11:
                 {
                     break;
                 }
