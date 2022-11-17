@@ -50,12 +50,24 @@ public class DApp{
                         System.out.println("Enter another slang? Enter 1 for Yes, other numbers for No: ");
                         int opt = input.nextInt();
                         if (opt!=1) check=!check;
+                        System.out.println();
                     }
                     break;
                 }
                 case 3:
                 {
+                    boolean check = true;
+                    while(check){
+                        System.out.print("Enter slang's definition: ");
+                        String word = input.nextLine();
+                        word = input.nextLine();
+                        sd.searchDefinition(word);
 
+                        System.out.println("Enter another slang's definition? Enter 1 for Yes, other numbers for No: ");
+                        int opt = input.nextInt();
+                        if (opt!=1) check=!check;
+                        System.out.println();
+                    }
                     break;
                 }
                 case 4:

@@ -7,11 +7,11 @@ public class slangDict {
     // private static Scanner input = new Scanner(System.in);
     
     private static HashMap<String,ArrayList<String>> dictionary = new HashMap<>();
-    //private static HashMap<String,ArrayList<String>> history = new HashMap<>();
+    private static HashMap<String,ArrayList<String>> history = new HashMap<>();
 
     public slangDict(){
         inputDict("slang.txt");
-        viewDictConsole();
+        sortWord();
     }
 
     //input file dict
@@ -54,7 +54,7 @@ public class slangDict {
             s=word+"`";
             ArrayList<String> a = dictionary.get(word);
             for (String d : a){
-                s+=d+"| ";
+                s+=d+"\n ";
             }
             s+="\n";
             fw.write(s);
@@ -69,21 +69,35 @@ public class slangDict {
     public void searchWord(String word){
         for (String str:dictionary.keySet()){
             if (word.equals(str)){
-                String s=str+"`";
+                String s="";
                 ArrayList<String> a = dictionary.get(str);
                 for (String d : a){
-                    s+=d+"| ";
+                    s+=d+"\n";
                 }
                 System.out.println(s);
+
+                history.put(str, dictionary.get(str));
                 return;
             }
         }
-        System.out.println("This slang is not in dictionary (UmU)...");
+        System.out.println("This slang is not in this dictionary (UmU)...\n");
     }
 
     //search definition
-    public void searchDefinition(String[] definition){
+    public void searchDefinition(String definition){
+        for (Map.Entry<String,ArrayList<String>> a:dictionary.entrySet()){
+            if (a.getValue()!=null){
+                for (String d : a.getValue()){
+                    if (definition.equals(d)){
+                        System.out.println(a.getKey()+"\n");
 
+                        history.put(a.getKey(), a.getValue());
+                        return;
+                    }   
+                }
+            }
+        }
+        System.out.println("We can not find the definition in this dictionary (UmU)...\n");
     }
 
     //show search history 
