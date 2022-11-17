@@ -102,7 +102,22 @@ public class slangDict {
 
     //show search history 
     public void viewSearchHistory(){
-
+        System.out.println("    Search History [OwO ] ");
+        if (history.keySet().size() == 0){
+            System.out.println("You haven't searched any slangs (ehe)>[UwU ]\n");
+            return;
+        }
+        for (String word:history.keySet()){
+            String s=word+"`";
+            ArrayList<String> a = history.get(word);
+            if (a!=null){
+                for (String d : a){
+                    s+=d+"| ";
+                }
+            }
+            System.out.println(s);
+        }
+        System.out.println();
     }
 
     //add slang --> check condition: overwrite/duplicate

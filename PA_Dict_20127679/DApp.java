@@ -72,7 +72,7 @@ public class DApp{
                 }
                 case 4:
                 {
-
+                    sd.viewSearchHistory();
                     break;
                 }
                 case 5:
