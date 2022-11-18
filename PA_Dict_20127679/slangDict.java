@@ -141,7 +141,7 @@ public class slangDict {
             } 
             dictionary.remove(word);
             //sortedDict.remove(word);
-            System.out.println("Slang is deleted! OAO\n");   
+            System.out.println("Slang is deleted! <OAO >\n");   
         }
     }
 
@@ -154,7 +154,7 @@ public class slangDict {
         } 
         dictionary.clear();
         //sortedDict.clear(); 
-        System.out.println("List is reset!! 0A0\n");   
+        System.out.println("List is reset!! <0A0 >\n");   
     }
 
     //random slang (On this day slang word)
@@ -202,6 +202,10 @@ public class slangDict {
     //view dictionary on console
     public void viewDictConsole(){
         sortWord();
+        if (sortedDict.keySet().size() == 0){
+            System.out.println("There is no slangs in this dictionary... <0A0 >\n");
+            return;
+        }
         for (String word:sortedDict.keySet()){
             String s=word+"`";
             ArrayList<String> a = dictionary.get(word);

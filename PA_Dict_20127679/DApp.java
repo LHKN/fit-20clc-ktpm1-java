@@ -110,9 +110,8 @@ public class DApp{
                 {
                     break;
                 }
-                case 12:
+                case 12: //debug zone
                 {
-                    sd.inputDict(filename);
                     sd.viewDictConsole();
                     break;
                 }
