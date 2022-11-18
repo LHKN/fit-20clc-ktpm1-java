@@ -4,7 +4,7 @@ import java.util.*;
 import java.io.*;
 
 public class slangDict {
-    // private static Scanner input = new Scanner(System.in);
+    private static Scanner input = new Scanner(System.in);
     
     private static HashMap<String,ArrayList<String>> dictionary = new HashMap<>();
     private static HashMap<String,ArrayList<String>> history = new HashMap<>();
@@ -66,7 +66,7 @@ public class slangDict {
         //need to save history?
 
     //search slang word
-    public void searchWord(String word){
+    public boolean searchWord(String word){
         for (String str:dictionary.keySet()){
             if (word.equals(str)){
                 String s="";
@@ -77,10 +77,11 @@ public class slangDict {
                 System.out.println(s);
 
                 history.put(str, dictionary.get(str));
-                return;
+                return true;
             }
         }
         System.out.println("This slang is not in this dictionary (UmU)...\n");
+        return false;
     }
 
     //search definition
@@ -131,13 +132,29 @@ public class slangDict {
     }
 
     //delete slang --> need confirm
-    public void deleteSlang(){
-
+    public void deleteSlang(String word){
+        if(searchWord(word)){
+            System.out.println("Do you want to delete this slang? Enter 1 for Yes, other numbers for No: ");   
+            int opt = input.nextInt();
+            if (opt!=1){
+                return;
+            } 
+            dictionary.remove(word);
+            //sortedDict.remove(word);
+            System.out.println("Slang is deleted! OAO\n");   
+        }
     }
 
     //reset slang list
     public void resetDict(){
-
+        System.out.println("Do you want to reset the dictionary? Enter 1 for Yes, other numbers for No: ");   
+        int opt = input.nextInt();
+        if (opt!=1){
+            return;
+        } 
+        dictionary.clear();
+        //sortedDict.clear(); 
+        System.out.println("List is reset!! 0A0\n");   
     }
 
     //random slang (On this day slang word)
@@ -165,6 +182,7 @@ public class slangDict {
 
     //sort dictionary
     public void sortWord(){
+        sortedDict.clear();
         wordComparator wc = new wordComparator();
         ArrayList<String> wordList = new ArrayList<>();
         for (String s: dictionary.keySet()) {

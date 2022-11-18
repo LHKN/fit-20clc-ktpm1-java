@@ -87,11 +87,15 @@ public class DApp{
                 }
                 case 7:
                 {
-
+                    System.out.print("Enter slang to delete: ");
+                    String word = input.nextLine();
+                    word = input.nextLine();
+                    sd.deleteSlang(word);
                     break;
                 }
                 case 8: 
                 {
+                    sd.resetDict();
                     break;
                 }
                 case 9:
