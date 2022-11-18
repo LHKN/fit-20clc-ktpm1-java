@@ -123,8 +123,40 @@ public class slangDict {
     }
 
     //add slang --> check condition: overwrite/duplicate
-    public void addSlang(){
-
+    public void addSlang(String word){
+        if(searchWord(word)){ //exist
+            System.out.println("The slang word already exists!! {-_- }");
+            System.out.println("Enter 1 to overwrite; Enter 2 to add to definition: ");
+            int opt = input.nextInt();
+            switch(opt){
+                case 2: 
+                {
+                    System.out.print("Enter new definition: ");
+                    String nw = input.nextLine();
+                    nw = input.nextLine();
+                    dictionary.get(word).add(nw);
+                    dictionary.put(word,dictionary.get(word));
+                    System.out.println("Updated!! {~_~ } \n");
+                    return;
+                }
+                case 1:
+                default:
+                {
+                    System.out.print("Enter new definition: ");
+                    String nw = input.nextLine();
+                    nw = input.nextLine();
+                    String[] nl = new String[]{nw};
+                    dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
+                    System.out.println("Updated!! {~_~ } \n");
+                    return;
+                }
+            }
+        }
+        System.out.print("Enter new definition: ");
+        String nw = input.nextLine();
+        String[] nl = new String[]{nw};
+        dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
+        System.out.println("Updated!! {~_~ } \n");
     }
 
     //edit slang
@@ -191,6 +223,9 @@ public class slangDict {
                     System.out.println("Option unvailable. Choose again!"); 
                 }
             }
+        }
+        else{
+            System.out.println("This slang is not in this dictionary (UmU)...\n");
         }
     }
 

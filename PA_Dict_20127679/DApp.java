@@ -81,7 +81,10 @@ public class DApp{
                 }
                 case 5:
                 {
-
+                    System.out.print("Enter slang to add: ");
+                    String word = input.nextLine();
+                    word = input.nextLine();
+                    sd.addSlang(word);
                     break;
                 }
                 case 6:
