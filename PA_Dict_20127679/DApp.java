@@ -7,7 +7,9 @@ public class DApp{
     //use swingUI/Console
     //draw cmd from slangDict
 
-    private static String filename = "slang.txt";
+    //private static String fi = "slang.txt";
+    //private static String fo = "slang2.txt";
+
     //console
     public static void main(String args[]) throws IOException{
         Scanner input = new Scanner(System.in);
@@ -45,7 +47,9 @@ public class DApp{
                         System.out.print("Enter slang: ");
                         String word = input.nextLine();
                         word = input.nextLine();
-                        sd.searchWord(word);
+                        if(!sd.searchWord(word)){
+                            System.out.println("This slang is not in this dictionary (UmU)...\n");
+                        }
 
                         System.out.println("Enter another slang? Enter 1 for Yes, other numbers for No: ");
                         int opt = input.nextInt();
@@ -82,7 +86,10 @@ public class DApp{
                 }
                 case 6:
                 {
-
+                    System.out.print("Enter slang to edit: ");
+                    String word = input.nextLine();
+                    word = input.nextLine();
+                    sd.editSlang(word);
                     break;
                 }
                 case 7:

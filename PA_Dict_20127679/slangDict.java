@@ -4,13 +4,15 @@ import java.util.*;
 import java.io.*;
 
 public class slangDict {
+    private static String filename = "slang.txt";
+
     private static Scanner input = new Scanner(System.in);
     
     private static HashMap<String,ArrayList<String>> dictionary = new HashMap<>();
     private static HashMap<String,ArrayList<String>> history = new HashMap<>();
 
     public slangDict(){
-        inputDict("slang.txt");
+        inputDict(filename);
         sortWord();
     }
 
@@ -80,7 +82,6 @@ public class slangDict {
                 return true;
             }
         }
-        System.out.println("This slang is not in this dictionary (UmU)...\n");
         return false;
     }
 
@@ -127,8 +128,70 @@ public class slangDict {
     }
 
     //edit slang
-    public void editSlang(){
-
+    public void editSlang(String word){
+        if(searchWord(word)){
+            while(true){
+                System.out.println("What do you want to edit? Enter 1 to replace word; Enter 2 to replace definition; Enter 3 to add to definition: ");   
+                int opt = input.nextInt();
+                switch(opt){
+                    case 1:
+                    {
+                        System.out.print("Enter new slang word: ");
+                        String nw = input.nextLine();
+                        nw = input.nextLine();
+                        if(searchWord(nw)){
+                            System.out.println("The slang word already exists!! {-_- } \n");
+                            return;
+                        }
+                        else{
+                            dictionary.put(nw,dictionary.get(word));
+                            dictionary.remove(word);
+                            System.out.println("Updated!! {~_~ } \n");
+                            return;
+                        }
+                    }
+                    case 2:
+                    {
+                        if(dictionary.get(word).size()>1){
+                            System.out.println("There are "+String.valueOf(dictionary.get(word).size())+" definitions. Enter number of the definition to replace (Out of range number will replace all definitions):");
+                            int n = input.nextInt();
+                            
+                            if(dictionary.get(word).size()>=n){
+                                System.out.print("Enter new definition: ");
+                                String nw = input.nextLine();
+                                nw = input.nextLine();
+                                dictionary.get(word).set(n-1, nw);
+                                System.out.println("Updated!! {~_~ } \n");
+                                return;
+                            }
+                            // else{
+                            //     System.out.print("Invalid option!! {-_- } ");
+                            //     return;
+                            // }
+                        }
+                        System.out.print("Enter new definition: ");
+                        String nw = input.nextLine();
+                        nw = input.nextLine();
+                        String[] nl = new String[]{nw};
+                        dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
+                        System.out.println("Updated!! {~_~ } \n");
+                        return;
+                    }
+                    case 3:
+                    {
+                        System.out.print("Enter new definition: ");
+                        String nw = input.nextLine();
+                        nw = input.nextLine();
+                        dictionary.get(word).add(nw);
+                        dictionary.put(word,dictionary.get(word));
+                        System.out.println("Updated!! {~_~ } \n");
+                        return;
+                    }
+                    default:
+                    System.out.println("Option unvailable. Choose again!"); 
+                }
+            }
+        }
     }
 
     //delete slang --> need confirm
@@ -140,8 +203,12 @@ public class slangDict {
                 return;
             } 
             dictionary.remove(word);
+
             //sortedDict.remove(word);
             System.out.println("Slang is deleted! <OAO >\n");   
+        }
+        else{
+            System.out.println("This slang is not in this dictionary (UmU)...\n");
         }
     }
 
