@@ -7,6 +7,7 @@ public class slangDict {
     private static String fi = "slang.txt";
 
     private static Scanner input = new Scanner(System.in);
+    private static Random rand = new Random();
     
     private static HashMap<String,ArrayList<String>> dictionary = new HashMap<>();
     private static HashMap<String,ArrayList<String>> history = new HashMap<>();
@@ -272,7 +273,20 @@ public class slangDict {
 
     //random slang (On this day slang word)
     public void randomSlang(){
+        int len = dictionary.keySet().size();
+        int idx = rand.nextInt(len) - 1;
 
+        System.out.println("    On this day slang word (^o^)/   :");
+        Object[] set = dictionary.keySet().toArray();
+
+        System.out.println(" Slang: "+set[idx]);
+        System.out.println(" Definition: ");
+        String s="";
+        ArrayList<String> a = dictionary.get(set[idx]);
+        for (String d : a){
+            s+=d+"\n";
+        }
+        System.out.println(s);
     }
 
     //minigame: 1 slang 4 definition options

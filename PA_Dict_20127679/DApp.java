@@ -110,6 +110,7 @@ public class DApp{
                 }
                 case 9:
                 {
+                    sd.randomSlang();
                     break;
                 }
                 case 10:
