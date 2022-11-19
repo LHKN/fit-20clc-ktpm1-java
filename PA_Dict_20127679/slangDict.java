@@ -5,6 +5,7 @@ import java.io.*;
 
 public class slangDict {
     private static String fi = "slang.txt";
+    private static String fo = "slang2.txt";
 
     private static Scanner input = new Scanner(System.in);
     private static Random rand = new Random();
@@ -14,7 +15,12 @@ public class slangDict {
 
     public slangDict(){
         inputDict(fi);
-        sortWord();
+        try{
+            outputDict(fo);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     //input file dict
@@ -44,26 +50,30 @@ public class slangDict {
 
     //output file dict
     public void outputDict(String filename) throws IOException{
-        String s;
-        FileWriter fw;
+        sortWord();
+        String s = "";
+        BufferedWriter writer;
         try{
-            fw = new FileWriter(filename);
+            writer = new BufferedWriter(new FileWriter(filename));
         }
         catch(IOException e){
-            System.out.println("Error opening file");
+            System.out.println("Error opening file\n");
             return;
         }
-        for (String word:dictionary.keySet()){
-            s=word+"`";
-            ArrayList<String> a = dictionary.get(word);
-            for (String d : a){
-                s+=d+"\n ";
+        for (String word:sortedDict.keySet()){
+            s+=word+"`";
+            ArrayList<String> a = sortedDict.get(word);
+            if (a!=null){
+                for (String d : a){
+                    s+=d+"| ";
+                }
             }
             s+="\n";
-            fw.write(s);
+            //fw.write(s);
         }
-        fw.close();
-        System.out.println("Output Successfully!");
+        writer.write(s);
+        writer.close();
+        System.out.println("Output Successfully!\n");
     }
 
         //need to save history?
@@ -135,7 +145,7 @@ public class slangDict {
     }
 
     //add slang --> check condition: overwrite/duplicate
-    public void addSlang(String word){
+    public void addSlang(String word) throws IOException{
         if(searchWord(word)){ //exist
             System.out.println("The slang word already exists!! {-_- }");
             System.out.println("Enter 1 to overwrite; Enter 2 to add to definition: ");
@@ -149,6 +159,7 @@ public class slangDict {
                     dictionary.get(word).add(nw);
                     dictionary.put(word,dictionary.get(word));
                     System.out.println("Updated!! {~_~ } \n");
+                    outputDict(fo);
                     return;
                 }
                 case 1:
@@ -160,6 +171,7 @@ public class slangDict {
                     String[] nl = new String[]{nw};
                     dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
                     System.out.println("Updated!! {~_~ } \n");
+                    outputDict(fo);
                     return;
                 }
             }
@@ -169,10 +181,11 @@ public class slangDict {
         String[] nl = new String[]{nw};
         dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
         System.out.println("Updated!! {~_~ } \n");
+        outputDict(fo);
     }
 
     //edit slang
-    public void editSlang(String word){
+    public void editSlang(String word) throws IOException{
         if(searchWord(word)){
             while(true){
                 System.out.println("What do you want to edit? Enter 1 to replace word; Enter 2 to replace definition; Enter 3 to add to definition: ");   
@@ -191,6 +204,7 @@ public class slangDict {
                             dictionary.put(nw,dictionary.get(word));
                             dictionary.remove(word);
                             System.out.println("Updated!! {~_~ } \n");
+                            outputDict(fo);
                             return;
                         }
                     }
@@ -206,6 +220,7 @@ public class slangDict {
                                 nw = input.nextLine();
                                 dictionary.get(word).set(n-1, nw);
                                 System.out.println("Updated!! {~_~ } \n");
+                                outputDict(fo);
                                 return;
                             }
                             // else{
@@ -219,6 +234,7 @@ public class slangDict {
                         String[] nl = new String[]{nw};
                         dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
                         System.out.println("Updated!! {~_~ } \n");
+                        outputDict(fo);
                         return;
                     }
                     case 3:
@@ -229,6 +245,7 @@ public class slangDict {
                         dictionary.get(word).add(nw);
                         dictionary.put(word,dictionary.get(word));
                         System.out.println("Updated!! {~_~ } \n");
+                        outputDict(fo);
                         return;
                     }
                     default:
@@ -242,7 +259,7 @@ public class slangDict {
     }
 
     //delete slang --> need confirm
-    public void deleteSlang(String word){
+    public void deleteSlang(String word) throws IOException{
         if(searchWord(word)){
             System.out.println("Do you want to delete this slang? Enter 1 for Yes, other numbers for No: ");   
             int opt = input.nextInt();
@@ -252,7 +269,8 @@ public class slangDict {
             dictionary.remove(word);
 
             //sortedDict.remove(word);
-            System.out.println("Slang is deleted! <OAO >\n");   
+            System.out.println("Slang is deleted! <OAO >\n"); 
+            outputDict(fo);  
         }
         else{
             System.out.println("This slang is not in this dictionary (UmU)...\n");
@@ -260,7 +278,7 @@ public class slangDict {
     }
 
     //reset slang list
-    public void resetDict(){
+    public void resetDict() throws IOException{
         System.out.println("Do you want to reset the dictionary? Enter 1 for Yes, other numbers for No: ");   
         int opt = input.nextInt();
         if (opt!=1){
@@ -269,6 +287,7 @@ public class slangDict {
         dictionary.clear();
         //sortedDict.clear(); 
         System.out.println("List is reset!! <0A0 >\n");   
+        outputDict(fo);
     }
 
     //random slang (On this day slang word)

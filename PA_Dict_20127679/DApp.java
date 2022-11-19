@@ -7,9 +7,6 @@ public class DApp{
     //use swingUI/Console
     //draw cmd from slangDict
 
-    //private static String fi = "slang.txt";
-    //private static String fo = "slang2.txt";
-
     //console
     public static void main(String args[]) throws IOException{
         Scanner input = new Scanner(System.in);
