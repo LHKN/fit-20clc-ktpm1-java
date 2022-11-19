@@ -4,7 +4,7 @@ import java.util.*;
 import java.io.*;
 
 public class slangDict {
-    private static String filename = "slang.txt";
+    private static String fi = "slang.txt";
 
     private static Scanner input = new Scanner(System.in);
     
@@ -12,7 +12,7 @@ public class slangDict {
     private static HashMap<String,ArrayList<String>> history = new HashMap<>();
 
     public slangDict(){
-        inputDict(filename);
+        inputDict(fi);
         sortWord();
     }
 
@@ -67,10 +67,11 @@ public class slangDict {
 
         //need to save history?
 
-    //search slang word
+    //search by slang word
     public boolean searchWord(String word){
         for (String str:dictionary.keySet()){
             if (word.equals(str)){
+                System.out.println("    Definition [OwO ]   :");
                 String s="";
                 ArrayList<String> a = dictionary.get(str);
                 for (String d : a){
@@ -85,26 +86,36 @@ public class slangDict {
         return false;
     }
 
-    //search definition
+    //search by definition
     public void searchDefinition(String definition){
+        boolean check = false;
+        HashMap<String,ArrayList<String>> result = new HashMap<>();
+
         for (Map.Entry<String,ArrayList<String>> a:dictionary.entrySet()){
             if (a.getValue()!=null){
                 for (String d : a.getValue()){
                     if (definition.equals(d)){
-                        System.out.println(a.getKey()+"\n");
-
-                        history.put(a.getKey(), a.getValue());
-                        return;
+                        check = true;
+                        result.put(a.getKey(), a.getValue());
                     }   
                 }
             }
         }
-        System.out.println("We can not find the definition in this dictionary (UmU)...\n");
+        if(check){
+            System.out.println("    Slang Result [OwO ]   :");
+            for (Map.Entry<String,ArrayList<String>> a:result.entrySet()){
+                System.out.println(a.getKey()+"\n");
+                history.put(a.getKey(), a.getValue());
+            }
+        }
+        else{
+            System.out.println("We can not find the definition in this dictionary (UmU)...\n");
+        } 
     }
 
     //show search history 
     public void viewSearchHistory(){
-        System.out.println("    Search History [OwO ] ");
+        System.out.println("    Search History [OwO ]   :");
         if (history.keySet().size() == 0){
             System.out.println("You haven't searched any slangs (ehe)>[UwU ]\n");
             return;
