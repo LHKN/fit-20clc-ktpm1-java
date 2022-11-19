@@ -112,10 +112,12 @@ public class DApp{
                 }
                 case 10:
                 {
+                    sd.wordMinigame();
                     break;
                 }
                 case 11:
                 {
+                    sd.definitionMinigame();
                     break;
                 }
                 case 12: //debug zone

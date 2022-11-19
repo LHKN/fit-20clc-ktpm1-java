@@ -291,31 +291,96 @@ public class slangDict {
     }
 
     //random slang (On this day slang word)
-    public void randomSlang(){
+    public String randomS(){
         int len = dictionary.keySet().size();
         int idx = rand.nextInt(len) - 1;
-
-        System.out.println("    On this day slang word (^o^)/   :");
+    
         Object[] set = dictionary.keySet().toArray();
 
-        System.out.println(" Slang: "+set[idx]);
+        return String.valueOf(set[idx]);
+    }
+
+    public void randomSlang(){
+        String slang = randomS();
+        System.out.println("    On this day slang word (^o^)/   :");
+        System.out.println(" Slang: "+String.valueOf(slang));
         System.out.println(" Definition: ");
         String s="";
-        ArrayList<String> a = dictionary.get(set[idx]);
+        ArrayList<String> a = dictionary.get(slang);
         for (String d : a){
             s+=d+"\n";
         }
         System.out.println(s);
+
     }
 
     //minigame: 1 slang 4 definition options
     public void wordMinigame(){
+        String slang = randomS();
 
+        HashMap<String,ArrayList<String>> al = new HashMap<>();
+        al.put(slang,dictionary.get(slang));
+
+        for(int i=0;i<3;i++){
+            String s = randomS();
+            al.put(s,dictionary.get(s));
+        }
+
+        //display quiz
+        System.out.println("    (._. ) < Slang: "+slang);
+        System.out.println("    ( ._.) < Guess the definition of the slang   :");
+        int count=0;
+        for(ArrayList<String> a:al.values()){
+            count+=1;
+            String str="";
+            for(String s:a){
+                str+=s + "| ";
+            }
+            System.out.println(String.valueOf(count)+") "+str);
+        }
+
+        Object[] set = al.keySet().toArray();
+        int opt = input.nextInt();
+        if(slang.equals(String.valueOf(set[opt-1]))){
+            System.out.println("    ( ._.) < Correct answer! Have a candy >( )< \n");
+        }
+        else{
+            System.out.println("    (._. ) < Wrong answer!! \n");
+        }
     }
 
     //minigame: 1 def 4 slang
     public void definitionMinigame(){
+        String slang = randomS();
+        ArrayList<String> definition = dictionary.get(slang);
+        ArrayList<String> al = new ArrayList<>();
+        al.add(slang);
 
+        for(int i=0;i<3;i++){
+            al.add(randomS());
+        }
+
+        Collections.shuffle(al);
+
+        //display quiz
+        System.out.println("    (._. ) < Definition: ");
+        for(String s:definition){
+            System.out.println(s);
+        }
+        System.out.println("    ( ._.) < Guess the slang! Enter number from 1-4:");
+        int count=0;
+        for(String s:al){
+            count+=1;
+            System.out.println(String.valueOf(count)+") "+s);
+        }
+
+        int opt = input.nextInt();
+        if(al.get(opt-1).equals(slang)){
+            System.out.println("    ( ._.) < Correct answer! Have a candy >( )< \n");
+        }
+        else{
+            System.out.println("    (._. ) < Wrong answer!! \n");
+        }
     }
 
         //additional methods for support/debug
