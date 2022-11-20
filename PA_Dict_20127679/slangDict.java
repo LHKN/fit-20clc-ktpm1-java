@@ -10,7 +10,7 @@ public class slangDict {
     private static Scanner input = new Scanner(System.in);
     private static Random rand = new Random();
     
-    private static HashMap<String,ArrayList<String>> dictionary = new HashMap<>();
+    private static HashMap<String,ArrayList<ArrayList<String>>> dictionary = new HashMap<>();
     private static HashMap<String,ArrayList<String>> history = new HashMap<>();
 
     public slangDict(){
@@ -30,6 +30,7 @@ public class slangDict {
         try{
             reader = new BufferedReader(new FileReader(filename));
             String line = reader.readLine();
+            String splitSlang = null;
             while (line!=null){
                 String[] splitLine = line.split("`");
                     //update dictionary here 
@@ -38,8 +39,24 @@ public class slangDict {
                 if (splitLine.length>1){
                     splitDefinition = splitLine[1].split("\\| ");
                     definition = new ArrayList<>(Arrays.asList(splitDefinition));
+
+                    if(dictionary.containsKey(splitLine[0])){
+                        dictionary.get(splitLine[0]).add(definition);
+                    }
+                    else{
+                        ArrayList<ArrayList<String>> def = new ArrayList<>();
+                        def.add(definition);
+                        dictionary.put(splitLine[0], def); 
+                    }
+                    splitSlang=splitLine[0];
                 }
-                dictionary.put(splitLine[0], definition); 
+                else if(splitLine.length==1){
+                    if (splitSlang!=null){
+                        ArrayList<ArrayList<String>> def = dictionary.get(splitSlang);
+                        def.add(new ArrayList<>(Arrays.asList(splitLine)));
+                        dictionary.put(splitSlang, def); 
+                    }
+                }
                 line = reader.readLine();
             }
             reader.close();
@@ -61,15 +78,15 @@ public class slangDict {
             return;
         }
         for (String word:sortedDict.keySet()){
-            s+=word+"`";
-            ArrayList<String> a = sortedDict.get(word);
-            if (a!=null){
-                for (String d : a){
-                    s+=d+"| ";
+            for(ArrayList<String> a:sortedDict.get(word)){
+                s+=word+"`";
+                if (a!=null){
+                    for (String d : a){
+                        s+=d+"| ";
+                    }
                 }
+                s+="\n";
             }
-            s+="\n";
-            //fw.write(s);
         }
         writer.write(s);
         writer.close();
@@ -84,13 +101,18 @@ public class slangDict {
             if (word.equals(str)){
                 System.out.println("    Definition [OwO ]   :");
                 String s="";
-                ArrayList<String> a = dictionary.get(str);
-                for (String d : a){
-                    s+=d+"\n";
+                ArrayList<ArrayList<String>> aa = dictionary.get(str);
+                for (ArrayList<String> a:aa){
+                    for (String d : a){
+                        s+=d+"\n";
+                    }
+                    s+="\n";
                 }
                 System.out.println(s);
 
-                history.put(str, dictionary.get(str));
+                for (ArrayList<String> d:dictionary.get(str)){
+                    history.put(str, d);
+                }
                 return true;
             }
         }
@@ -100,28 +122,32 @@ public class slangDict {
     //search by definition
     public void searchDefinition(String definition){
         boolean check = false;
-        HashMap<String,ArrayList<String>> result = new HashMap<>();
+        HashMap<String,ArrayList<ArrayList<String>>> result = new HashMap<>();
 
-        for (Map.Entry<String,ArrayList<String>> a:dictionary.entrySet()){
-            if (a.getValue()!=null){
-                for (String d : a.getValue()){
-                    if (definition.equals(d)){
+        for (Map.Entry<String,ArrayList<ArrayList<String>>> e:dictionary.entrySet()){
+            if (e.getValue()!=null){
+                for (ArrayList<String> a : e.getValue()){
+                    for (String d : a){
+                        if (d.contains(definition)){
                         check = true;
-                        result.put(a.getKey(), a.getValue());
-                    }   
+                        result.put(e.getKey(), e.getValue());
+                        }   
+                    }
                 }
             }
         }
         if(check){
             System.out.println("    Slang Result [OwO ]   :");
-            for (Map.Entry<String,ArrayList<String>> a:result.entrySet()){
+            for (Map.Entry<String,ArrayList<ArrayList<String>>> a:result.entrySet()){
                 System.out.println(a.getKey()+"\n");
-                history.put(a.getKey(), a.getValue());
+                for (ArrayList<String> d:a.getValue()){
+                    history.put(a.getKey(), d);
+                }
             }
         }
         else{
             System.out.println("We can not find the definition in this dictionary (UmU)...\n");
-        } 
+        }
     }
 
     //show search history 
@@ -148,38 +174,67 @@ public class slangDict {
     public void addSlang(String word) throws IOException{
         if(searchWord(word)){ //exist
             System.out.println("The slang word already exists!! {-_- }");
-            System.out.println("Enter 1 to overwrite; Enter 2 to add to definition: ");
+            System.out.println("Enter 1 to overwrite; Enter 2 to add to definition: "); //enter 3 to duplicate?
             int opt = input.nextInt();
             switch(opt){
                 case 2: 
                 {
+                    int idx=0;
+                    if (dictionary.get(word).size()>1){
+                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select:");
+                        idx=input.nextInt()-1;
+                        if(idx>=dictionary.get(word).size()){
+                            System.out.print("Invalid option!! {-_- }");
+                            return;
+                        }
+                    }
+
                     System.out.print("Enter new definition: ");
                     String nw = input.nextLine();
                     nw = input.nextLine();
-                    dictionary.get(word).add(nw);
-                    dictionary.put(word,dictionary.get(word));
+                    dictionary.get(word).get(idx).add(nw);
+                    //dictionary.put(word,dictionary.get(word));
                     System.out.println("Updated!! {~_~ } \n");
                     outputDict(fo);
                     return;
                 }
                 case 1:
-                default:
                 {
+                    int idx=0;
+                    if (dictionary.get(word).size()>1){
+                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select:");
+                        idx=input.nextInt()-1;
+                        if(idx>=dictionary.get(word).size()){
+                            System.out.print("Invalid option!! {-_- }");
+                            return;
+                        }
+                    }
                     System.out.print("Enter new definition: ");
                     String nw = input.nextLine();
                     nw = input.nextLine();
                     String[] nl = new String[]{nw};
-                    dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
+                    ArrayList<ArrayList<String>> d = dictionary.get(word);
+                    d.get(idx).clear();
+                    d.get(idx).addAll(new ArrayList<String>(Arrays.asList(nl)));
+                    //dictionary.put(word,d);
                     System.out.println("Updated!! {~_~ } \n");
                     outputDict(fo);
+                    return;
+                }
+                default:
+                {
+                    System.out.print("Invalid number!! {-_- }");
                     return;
                 }
             }
         }
         System.out.print("Enter new definition: ");
         String nw = input.nextLine();
+        nw = input.nextLine();
         String[] nl = new String[]{nw};
-        dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
+        ArrayList<ArrayList<String>> d = new ArrayList<>();
+        d.add(new ArrayList<String>(Arrays.asList(nl)));
+        dictionary.put(word,d);
         System.out.println("Updated!! {~_~ } \n");
         outputDict(fo);
     }
@@ -193,6 +248,16 @@ public class slangDict {
                 switch(opt){
                     case 1:
                     {
+                        int idx=0;
+                        if (dictionary.get(word).size()>1){                        
+                            System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select: ");
+                            idx=input.nextInt()-1;
+                            if(dictionary.get(word).size()<=idx){
+                                System.out.print("Invalid option!! {-_- } ");
+                                return;
+                            }
+                        }
+
                         System.out.print("Enter new slang word: ");
                         String nw = input.nextLine();
                         nw = input.nextLine();
@@ -201,49 +266,69 @@ public class slangDict {
                             return;
                         }
                         else{
-                            dictionary.put(nw,dictionary.get(word));
-                            dictionary.remove(word);
-                            System.out.println("Updated!! {~_~ } \n");
-                            outputDict(fo);
-                            return;
-                        }
-                    }
-                    case 2:
-                    {
-                        if(dictionary.get(word).size()>1){
-                            System.out.println("There are "+String.valueOf(dictionary.get(word).size())+" definitions. Enter number of the definition to replace (Out of range number will replace all definitions):");
-                            int n = input.nextInt();
-                            
-                            if(dictionary.get(word).size()>=n){
-                                System.out.print("Enter new definition: ");
-                                String nw = input.nextLine();
-                                nw = input.nextLine();
-                                dictionary.get(word).set(n-1, nw);
+                            if(dictionary.get(word).size()>1){
+                                //WIP
+                                return;
+                            }
+                            else{
+                                dictionary.put(nw,dictionary.get(word));
+                                dictionary.remove(word);
                                 System.out.println("Updated!! {~_~ } \n");
                                 outputDict(fo);
                                 return;
                             }
-                            // else{
-                            //     System.out.print("Invalid option!! {-_- } ");
-                            //     return;
-                            // }
                         }
+                    }
+                    case 2:
+                    {
+                        int idx=0;
+                        if (dictionary.get(word).size()>1){                        
+                            System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select: ");
+                            idx=input.nextInt()-1;
+                            if(dictionary.get(word).size()<=idx){
+                                System.out.print("Invalid option!! {-_- } ");
+                                return;
+                            }
+                        }
+                        
+                        int n =0;
+                        if(dictionary.get(word).get(idx).size()>1){
+                            System.out.println("There are "+String.valueOf(dictionary.get(word).size())+" definitions. Enter number of the definition to replace: ");
+                            n = input.nextInt()-1;
+                                
+                            if(dictionary.get(word).get(idx).size()<=n){
+                                System.out.print("Invalid option!! {-_- } ");
+                                return;
+                            }
+                        }
+
                         System.out.print("Enter new definition: ");
                         String nw = input.nextLine();
                         nw = input.nextLine();
-                        String[] nl = new String[]{nw};
-                        dictionary.put(word,new ArrayList<String>(Arrays.asList(nl)));
+
+                        ArrayList<ArrayList<String>> d = dictionary.get(word);
+                        d.get(idx).set(n, nw);
+                        //dictionary.put(word,d);
                         System.out.println("Updated!! {~_~ } \n");
                         outputDict(fo);
                         return;
                     }
                     case 3:
                     {
+                        int idx=0;
+                        if (dictionary.get(word).size()>1){                        
+                            System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select: ");
+                            idx=input.nextInt()-1;
+                            if(dictionary.get(word).size()<=idx){
+                                System.out.print("Invalid option!! {-_- } ");
+                                return;
+                            }
+                        }
+
                         System.out.print("Enter new definition: ");
                         String nw = input.nextLine();
                         nw = input.nextLine();
-                        dictionary.get(word).add(nw);
-                        dictionary.put(word,dictionary.get(word));
+                        dictionary.get(word).get(idx).add(nw);
                         System.out.println("Updated!! {~_~ } \n");
                         outputDict(fo);
                         return;
@@ -306,9 +391,11 @@ public class slangDict {
         System.out.println(" Slang: "+String.valueOf(slang));
         System.out.println(" Definition: ");
         String s="";
-        ArrayList<String> a = dictionary.get(slang);
-        for (String d : a){
-            s+=d+"\n";
+        ArrayList<ArrayList<String>> aa = dictionary.get(slang);
+        for (ArrayList<String> a:aa){
+            for (String d : a){
+                s+=d+"\n";
+            }
         }
         System.out.println(s);
 
@@ -318,7 +405,7 @@ public class slangDict {
     public void wordMinigame(){
         String slang = randomS();
 
-        HashMap<String,ArrayList<String>> al = new HashMap<>();
+        HashMap<String,ArrayList<ArrayList<String>>> al = new HashMap<>();
         al.put(slang,dictionary.get(slang));
 
         for(int i=0;i<3;i++){
@@ -328,15 +415,17 @@ public class slangDict {
 
         //display quiz
         System.out.println("    (._. ) < Slang: "+slang);
-        System.out.println("    ( ._.) < Guess the definition of the slang   :");
+        System.out.println("    ( ._.) < Guess the definition of the slang! Enter number from 1-4:");
         int count=0;
-        for(ArrayList<String> a:al.values()){
-            count+=1;
-            String str="";
-            for(String s:a){
-                str+=s + "| ";
+        for(ArrayList<ArrayList<String>> aa:al.values()){
+            for(ArrayList<String> a:aa){
+                count+=1;
+                String str="";
+                for(String s:a){
+                    str+=s + "| ";
+                }
+                System.out.println(String.valueOf(count)+") "+str);
             }
-            System.out.println(String.valueOf(count)+") "+str);
         }
 
         Object[] set = al.keySet().toArray();
@@ -352,7 +441,7 @@ public class slangDict {
     //minigame: 1 def 4 slang
     public void definitionMinigame(){
         String slang = randomS();
-        ArrayList<String> definition = dictionary.get(slang);
+        ArrayList<ArrayList<String>> definition = dictionary.get(slang);
         ArrayList<String> al = new ArrayList<>();
         al.add(slang);
 
@@ -364,8 +453,10 @@ public class slangDict {
 
         //display quiz
         System.out.println("    (._. ) < Definition: ");
-        for(String s:definition){
-            System.out.println(s);
+        for(ArrayList<String> a:definition){
+            for(String s:a){
+                System.out.println(s);
+            }
         }
         System.out.println("    ( ._.) < Guess the slang! Enter number from 1-4:");
         int count=0;
@@ -384,7 +475,7 @@ public class slangDict {
     }
 
         //additional methods for support/debug
-    LinkedHashMap<String,ArrayList<String>> sortedDict = new LinkedHashMap<>();
+    LinkedHashMap<String,ArrayList<ArrayList<String>>> sortedDict = new LinkedHashMap<>();
     class wordComparator implements Comparator<String>{
         public int compare(String s1, String s2){
             return s1.compareTo(s2);
@@ -418,14 +509,15 @@ public class slangDict {
             return;
         }
         for (String word:sortedDict.keySet()){
-            String s=word+"`";
-            ArrayList<String> a = dictionary.get(word);
-            if (a!=null){
-                for (String d : a){
-                    s+=d+"| ";
+            for (ArrayList<String> a:sortedDict.get(word)){
+                String s=word+"`";
+                if (a!=null){
+                    for (String d : a){
+                        s+=d+"| ";
+                    }
                 }
+                System.out.println(s);
             }
-            System.out.println(s);
         }
         System.out.println();
     }
