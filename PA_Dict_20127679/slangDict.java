@@ -174,14 +174,14 @@ public class slangDict {
     public void addSlang(String word) throws IOException{
         if(searchWord(word)){ //exist
             System.out.println("The slang word already exists!! {-_- }");
-            System.out.println("Enter 1 to overwrite; Enter 2 to add to definition; Enter 3 to duplicate: ");
+            System.out.println("Enter 1 to overwrite; Enter 2 to add to definition; Enter 3 to duplicate this slang: ");
             int opt = input.nextInt();
             switch(opt){
                 case 1:
                 {
                     int idx=0;
                     if (dictionary.get(word).size()>1){
-                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select:");
+                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select: ");
                         idx=input.nextInt()-1;
                         if(idx>=dictionary.get(word).size()){
                             System.out.print("Invalid option!! {-_- }");
@@ -204,7 +204,7 @@ public class slangDict {
                 {
                     int idx=0;
                     if (dictionary.get(word).size()>1){
-                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select:");
+                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select: ");
                         idx=input.nextInt()-1;
                         if(idx>=dictionary.get(word).size()){
                             System.out.print("Invalid option!! {-_- }");
@@ -225,7 +225,7 @@ public class slangDict {
                 {
                     int idx=0;
                     if (dictionary.get(word).size()>1){
-                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select:");
+                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select: ");
                         idx=input.nextInt()-1;
                         if(idx>=dictionary.get(word).size()){
                             System.out.print("Invalid option!! {-_- }");
@@ -233,7 +233,11 @@ public class slangDict {
                         }
                     }
 
-                    ArrayList<String> na = dictionary.get(word).get(idx);
+                    //deep copy
+                    ArrayList<String> na = new ArrayList<>();
+                    for (String a:dictionary.get(word).get(idx)){
+                        na.add(a);
+                    }
                     dictionary.get(word).add(na);
 
                     System.out.println("Duplicated!! {~_~ } \n");
@@ -281,12 +285,23 @@ public class slangDict {
                         String nw = input.nextLine();
                         nw = input.nextLine();
                         if(searchWord(nw)){
-                            System.out.println("The slang word already exists!! {-_- } \n");
+                            System.out.println("The slang word already exists!! Please go to add slang... {-_- } \n");
                             return;
                         }
                         else{
                             if(dictionary.get(word).size()>1){
-                                //WIP
+                                ArrayList<ArrayList<String>> d = new ArrayList<>();
+                                //deep copy
+                                ArrayList<String> na = new ArrayList<>();
+                                for (String a:dictionary.get(word).get(idx)){
+                                    na.add(a);
+                                }
+
+                                d.add(na);
+                                dictionary.get(word).remove(idx);
+                                dictionary.put(nw,d);
+                                System.out.println("Updated!! {~_~ } \n");
+                                outputDict(fo);
                                 return;
                             }
                             else{
@@ -312,7 +327,7 @@ public class slangDict {
                         
                         int n =0;
                         if(dictionary.get(word).get(idx).size()>1){
-                            System.out.println("There are "+String.valueOf(dictionary.get(word).size())+" definitions. Enter number of the definition to replace: ");
+                            System.out.println("There are "+String.valueOf(dictionary.get(word).get(idx).size())+" definitions. Enter number of the definition to replace: ");
                             n = input.nextInt()-1;
                                 
                             if(dictionary.get(word).get(idx).size()<=n){
@@ -325,8 +340,8 @@ public class slangDict {
                         String nw = input.nextLine();
                         nw = input.nextLine();
 
-                        ArrayList<ArrayList<String>> d = dictionary.get(word);
-                        d.get(idx).set(n, nw);
+                        dictionary.get(word).get(idx).set(n, nw);
+
                         //dictionary.put(word,d);
                         System.out.println("Updated!! {~_~ } \n");
                         outputDict(fo);
@@ -365,13 +380,29 @@ public class slangDict {
     //delete slang --> need confirm
     public void deleteSlang(String word) throws IOException{
         if(searchWord(word)){
+            int idx=0;
+            if(dictionary.get(word).size()>1){
+                System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select: ");
+                idx=input.nextInt()-1;
+                if(dictionary.get(word).size()<=idx){
+                    System.out.print("Invalid option!! {-_- } ");
+                    return;
+                }
+            }
+            
             System.out.println("Do you want to delete this slang? Enter 1 for Yes, other numbers for No: ");   
             int opt = input.nextInt();
             if (opt!=1){
+                System.out.println("Returning to menu... {-_- }\n"); 
                 return;
             } 
-            dictionary.remove(word);
 
+            if(dictionary.get(word).size()>1){
+                dictionary.get(word).remove(idx);
+            }
+            else{
+                dictionary.remove(word);
+            }
             //sortedDict.remove(word);
             System.out.println("Slang is deleted! <OAO >\n"); 
             outputDict(fo);  
@@ -388,8 +419,7 @@ public class slangDict {
         if (opt!=1){
             return;
         } 
-        dictionary.clear();
-        //sortedDict.clear(); 
+        inputDict(fi); 
         System.out.println("List is reset!! <0A0 >\n");   
         outputDict(fo);
     }
