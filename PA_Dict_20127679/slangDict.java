@@ -174,9 +174,32 @@ public class slangDict {
     public void addSlang(String word) throws IOException{
         if(searchWord(word)){ //exist
             System.out.println("The slang word already exists!! {-_- }");
-            System.out.println("Enter 1 to overwrite; Enter 2 to add to definition: "); //enter 3 to duplicate?
+            System.out.println("Enter 1 to overwrite; Enter 2 to add to definition; Enter 3 to duplicate: ");
             int opt = input.nextInt();
             switch(opt){
+                case 1:
+                {
+                    int idx=0;
+                    if (dictionary.get(word).size()>1){
+                        System.out.print("The entered slang is duplicated. Enter number from 1 to "+String.valueOf(dictionary.get(word).size())+" to select:");
+                        idx=input.nextInt()-1;
+                        if(idx>=dictionary.get(word).size()){
+                            System.out.print("Invalid option!! {-_- }");
+                            return;
+                        }
+                    }
+                    System.out.print("Enter new definition: ");
+                    String nw = input.nextLine();
+                    nw = input.nextLine();
+                    String[] nl = new String[]{nw};
+                    ArrayList<ArrayList<String>> d = dictionary.get(word);
+                    d.get(idx).clear();
+                    d.get(idx).addAll(new ArrayList<String>(Arrays.asList(nl)));
+                    //dictionary.put(word,d);
+                    System.out.println("Updated!! {~_~ } \n");
+                    outputDict(fo);
+                    return;
+                }
                 case 2: 
                 {
                     int idx=0;
@@ -198,7 +221,7 @@ public class slangDict {
                     outputDict(fo);
                     return;
                 }
-                case 1:
+                case 3:
                 {
                     int idx=0;
                     if (dictionary.get(word).size()>1){
@@ -209,15 +232,11 @@ public class slangDict {
                             return;
                         }
                     }
-                    System.out.print("Enter new definition: ");
-                    String nw = input.nextLine();
-                    nw = input.nextLine();
-                    String[] nl = new String[]{nw};
-                    ArrayList<ArrayList<String>> d = dictionary.get(word);
-                    d.get(idx).clear();
-                    d.get(idx).addAll(new ArrayList<String>(Arrays.asList(nl)));
-                    //dictionary.put(word,d);
-                    System.out.println("Updated!! {~_~ } \n");
+
+                    ArrayList<String> na = dictionary.get(word).get(idx);
+                    dictionary.get(word).add(na);
+
+                    System.out.println("Duplicated!! {~_~ } \n");
                     outputDict(fo);
                     return;
                 }
