@@ -11,7 +11,7 @@ public class slangDict {
     private static Random rand = new Random();
     
     private static HashMap<String,ArrayList<ArrayList<String>>> dictionary = new HashMap<>();
-    private static HashMap<String,ArrayList<String>> history = new HashMap<>();
+    private static HashMap<String,ArrayList<ArrayList<String>>> history = new HashMap<>();
 
     public slangDict(){
         inputDict(fi);
@@ -110,9 +110,8 @@ public class slangDict {
                 }
                 System.out.println(s);
 
-                for (ArrayList<String> d:dictionary.get(str)){
-                    history.put(str, d);
-                }
+                history.put(str, aa);
+
                 return true;
             }
         }
@@ -140,9 +139,7 @@ public class slangDict {
             System.out.println("    Slang Result [OwO ]   :");
             for (Map.Entry<String,ArrayList<ArrayList<String>>> a:result.entrySet()){
                 System.out.println(a.getKey()+"\n");
-                for (ArrayList<String> d:a.getValue()){
-                    history.put(a.getKey(), d);
-                }
+                history.put(a.getKey(), a.getValue());
             }
         }
         else{
@@ -158,14 +155,17 @@ public class slangDict {
             return;
         }
         for (String word:history.keySet()){
-            String s=word+"`";
-            ArrayList<String> a = history.get(word);
-            if (a!=null){
-                for (String d : a){
-                    s+=d+"| ";
+            ArrayList<ArrayList<String>> aa = history.get(word);
+            for(ArrayList<String>a:aa){
+                String s=word+"`";
+                if (a!=null){
+                    for (String d : a){
+                        s+=d+"| ";
+                    }
                 }
+                s+="\n";
+                System.out.println(s);
             }
-            System.out.println(s);
         }
         System.out.println();
     }
