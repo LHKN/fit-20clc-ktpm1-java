@@ -273,6 +273,54 @@ public class slangDict {
         outputDict(fo);
     }
 
+        //swing ver
+
+    public boolean checkDup(String word){
+        return (dictionary.get(word).size()>1);
+    }
+
+    public ArrayList<ArrayList<String>> getDefinition(String word){
+        return dictionary.get(word);
+    }
+    
+    public boolean overwrite(String word, String definition, int idx) throws IOException{
+        String[] nl = new String[]{definition};
+        ArrayList<ArrayList<String>> d = dictionary.get(word);
+        d.get(idx).clear();
+        d.get(idx).addAll(new ArrayList<String>(Arrays.asList(nl)));
+        System.out.println("Updated!! {~_~ } \n");
+        outputDict(fo);
+        return true;
+    }
+
+    public boolean append(String word, String definition, int idx) throws IOException{
+        dictionary.get(word).get(idx).add(definition);
+        System.out.println("Updated!! {~_~ } \n");
+        outputDict(fo);
+        return true;    
+    }
+    
+    public void duplicate(String word, int idx) throws IOException{
+        //deep copy
+        ArrayList<String> na = new ArrayList<>();
+        for (String a:dictionary.get(word).get(idx)){
+            na.add(a);
+        }
+        dictionary.get(word).add(na);
+        
+        System.out.println("Duplicated!! {~_~ } \n");
+        outputDict(fo);
+        return;
+    }
+    
+    public void add(String word,String definition) throws IOException{
+        String[] nl = new String[]{definition};
+        ArrayList<ArrayList<String>> d = new ArrayList<>();
+        d.add(new ArrayList<String>(Arrays.asList(nl)));
+        dictionary.put(word,d);
+        outputDict(fo);
+    }
+    
     //edit slang
     public void editSlang(String word) throws IOException{
         if(foundWord(word)){

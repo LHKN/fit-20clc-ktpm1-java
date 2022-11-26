@@ -374,9 +374,11 @@ public class DApp implements ItemListener{
                         ArrayList<ArrayList<String>> aa = sd.searchWord(t);
                         if (aa!=null){
                             for (ArrayList<String> a:aa){
+                                String str="";
                                 for (String s:a){
-                                    s_model.addElement(s);
+                                    str+=s+"; ";
                                 }
+                                s_model.addElement(str);
                             }
                         }
                         else{
@@ -428,7 +430,7 @@ public class DApp implements ItemListener{
                         for (ArrayList<String> aa:hm.get(k)){
                             String s = k + " : ";
                             for (String a:aa){
-                                s+=a+"| ";
+                                s+=a+"; ";
                             }
                             v_history.addElement(s);
                         }
@@ -439,12 +441,135 @@ public class DApp implements ItemListener{
                 }
             }
         });
+        
+        a_confirm_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0){
+                String w = a_text1.getText();
+                String d = a_text2.getText();
+
+                if(w.equals("")){
+                    JFrame noti = new JFrame("Notification");
+                    JOptionPane.showMessageDialog(noti, "The slang word text field is empty! Please enter something (UmU)...");
+                    return;
+                }
+
+                if(sd.foundWord(w)){
+                    JFrame noti = new JFrame("Options");
+                    Object[] options1 = { "Overwrite definition", "Add to definition","Duplicate slang","Cancel" };
+                    int i = JOptionPane.showOptionDialog(noti, "The slang word already exists!! {-_- } Would you like to: ", "Options", 0, 0, null, options1, null);
+                    if (i==3) return;
+
+                    int idx = 0;
+
+                    if(sd.checkDup(w)){
+                        JPanel a_result = new JPanel();
+    
+                        DefaultListModel<String> a_model = new DefaultListModel<String>();
+                        ArrayList<String> aa = new ArrayList<>();
+
+                        JList<String> a_list = new JList<String>(a_model);
+                        a_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                        a_list.setLayoutOrientation(JList.VERTICAL);
+                        a_list.setSelectedIndex(0);
+                        a_list.setVisibleRowCount(5);
+                        a_list.setVisible(true);
+    
+                        JScrollPane asp = new JScrollPane(a_list);
+                        asp.setPreferredSize(new Dimension(500,500));
+                        a_result.add(asp);
+
+                        ArrayList<ArrayList<String>> old = sd.getDefinition(w);
+                        
+                        for (ArrayList<String> a:old){
+                            String str="";
+                            for (String s:a){
+                                str+=s+"; ";
+                            }
+                            a_model.addElement(str);
+                            aa.add(str);
+                        }
+
+                        Object[] options2 = {"Confirm","Cancel"};
+                        int ii = JOptionPane.showOptionDialog(noti, new Object[]{"The entered slang is duplicated. Please select the slang you want to work with:",a_result}, "Options", 0, 0, null, options2, null);
+                        if (ii == 0){
+                            idx = a_list.getSelectedIndex();
+                        }
+                    }
+
+                    switch (i){
+                        case 0:
+                        {
+                            try{
+                                sd.overwrite(w, d, idx);
+                                JFrame n = new JFrame("Notification");
+                                JOptionPane.showMessageDialog(n, "Updated!! {~_~ }");
+                            }
+                            catch(Exception e){
+                                e.printStackTrace();
+                            }
+                            break;
+                        } 
+                        case 1:
+                        {
+                            try{
+                                sd.append(w, d, idx);
+                                JFrame n = new JFrame("Notification");
+                                JOptionPane.showMessageDialog(n, "Updated!! {~_~ }");
+                            }
+                            catch(Exception e){
+                                e.printStackTrace();
+                            }
+                            break;
+                        }
+                        case 2:
+                        {
+                            try{
+                                sd.duplicate(w, idx);
+                                JFrame n = new JFrame("Notification");
+                                JOptionPane.showMessageDialog(n, "Updated!! {~_~ }");
+                            }
+                            catch(Exception e){
+                                e.printStackTrace();
+                            }
+                            break;
+                        }
+                        default:
+                        return;
+                    }
+
+                }
+                else{
+                    try{
+                        sd.add(w,d);
+                        JFrame noti = new JFrame("Notification");
+                        JOptionPane.showMessageDialog(noti, "Updated!! {~_~ }");
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
 
         add_btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,options2[2]);
+            }
+        });
+
+        e_confirm_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                String w = e_text.getText();
+
+                if(w.equals("")){
+                    JFrame noti = new JFrame("Notification");
+                    JOptionPane.showMessageDialog(noti, "The slang word text field is empty! Please enter something (UmU)...");
+                    return;
+                }
 
                 //doStuff();
             }
@@ -455,18 +580,29 @@ public class DApp implements ItemListener{
             public void actionPerformed(ActionEvent arg0) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,options2[3]);
-                
-                //doStuff();
             }
         });
         
+        d_confirm_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {  
+                String w = e_text.getText();
+
+                if(w.equals("")){
+                    JFrame noti = new JFrame("Notification");
+                    JOptionPane.showMessageDialog(noti, "The slang word text field is empty! Please enter something (UmU)...");
+                    return;
+                }
+
+                //doStuff();
+            }
+        });
+
         delete_btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,options2[4]);
-                
-                //doStuff();
             }
         });
 
@@ -519,17 +655,6 @@ public class DApp implements ItemListener{
 
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
 
-
-        //event?
-        // MyBtnListener ml = new MyBtnListener();
-
-        // ccbtn.setPreferredSize(null);
-        // ccbtn.setActionCommand(null);
-        // ccbtn.addActionListener(ml);
-        // ccbtn.addActionListener("CANCEL");
-
-
-        //pane.add(searchpanel, BorderLayout.WEST);
         pane.add(cards, BorderLayout.CENTER);
         pane.add(buttons, BorderLayout.EAST);        
     }
@@ -570,4 +695,5 @@ public class DApp implements ItemListener{
            }
         });
     }
+    //main referenced from teacher's Beeper demonstration
 }
