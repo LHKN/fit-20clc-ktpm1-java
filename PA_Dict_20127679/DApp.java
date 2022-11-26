@@ -1,19 +1,25 @@
 //package PA_Dict_20127679;
 import java.io.*;
 import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-public class DApp{
+public class DApp implements ItemListener{
     //main
     //use swingUI/Console
     //draw cmd from slangDict
+    private static slangDict sd;
+    private static String fi = "slang.txt";
+    private static String fo = "slang2.txt";
 
     //console
-    public static void main(String args[]) throws IOException{
+    public static void ConsoleUI() throws IOException{
         Scanner input = new Scanner(System.in);
-        slangDict sd = new slangDict();
+        sd = new slangDict();
         while(true){
             System.out.println("Enter 1 to end the program;");
-
+    
             System.out.println("Enter 2 to search a slang's definition using slang;");
             System.out.println("Enter 3 to search a slang using slang's definition;");
             System.out.println("Enter 4 to view search history;");
@@ -24,12 +30,12 @@ public class DApp{
             System.out.println("Enter 9 to randomize a slang (On this day slang word);");
             System.out.println("Enter 10 to play minigame ( ._.)! Guess the definition of the slang;");
             System.out.println("Enter 11 to play minigame (._. )! Guess the slang.");
-
+    
             System.out.println("Enter 12 to view dictionary.");
-
+    
             int option = input.nextInt();
             System.out.println();
-
+    
             switch(option){
                 case 1: //end program
                 {
@@ -44,10 +50,8 @@ public class DApp{
                         System.out.print("Enter slang: ");
                         String word = input.nextLine();
                         word = input.nextLine();
-                        if(!sd.searchWord(word)){
-                            System.out.println("This slang is not in this dictionary (UmU)...\n");
-                        }
-
+                        sd.searchWord(word);
+    
                         System.out.println("Enter another slang? Enter 1 for Yes, other numbers for No: ");
                         int opt = input.nextInt();
                         if (opt!=1) check=!check;
@@ -63,7 +67,7 @@ public class DApp{
                         String word = input.nextLine();
                         word = input.nextLine();
                         sd.searchDefinition(word);
-
+    
                         System.out.println("Enter another slang's definition? Enter 1 for Yes, other numbers for No: ");
                         int opt = input.nextInt();
                         if (opt!=1) check=!check;
@@ -129,5 +133,435 @@ public class DApp{
                 System.out.println("Option unvailable. Choose again!");       
             }
         }
+    }
+
+    //SwingUI
+    JPanel cards;
+    String options1[] = {"Search by slang word","Search by definition"};
+    String options2[] = {"Search slang","View search history","Add Slang","Edit Slang","Delete Slang","Reset List","Random Slang","Minigame 1","Minigame 2"};
+    
+    public void addComponentToPane(Container pane){
+        //SEARCH
+        JPanel searchpanel = new JPanel();
+
+        JButton s_confirm_btn = new JButton("CONFIRM");
+        JComboBox<String> scb = new JComboBox<String>(options1);
+        scb.setMaximumSize(new Dimension(200,30));
+        scb.setEditable(false);
+        JTextField s_text = new JTextField();
+        s_text.setMaximumSize(new Dimension(200,30)); 
+        
+        searchpanel.add(scb, BorderLayout.EAST);
+        searchpanel.add(s_text, BorderLayout.SOUTH);
+        searchpanel.add(s_confirm_btn, BorderLayout.SOUTH);
+
+        searchpanel.setLayout(new BoxLayout(searchpanel, BoxLayout.Y_AXIS));
+
+        JPanel s_result = new JPanel();
+
+        DefaultListModel<String> s_model = new DefaultListModel<String>();
+         
+        JList<String> s_list = new JList<String>(s_model);
+        s_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        s_list.setLayoutOrientation(JList.VERTICAL);
+        s_list.setSelectedIndex(0);
+        s_list.setVisibleRowCount(5);
+        s_list.setVisible(true);
+
+        JScrollPane ssp = new JScrollPane(s_list);
+        ssp.setPreferredSize(new Dimension(500,500));
+        s_result.add(ssp);
+
+        searchpanel.add(s_result);
+
+        cards = new JPanel(new CardLayout());
+        cards.add(searchpanel, options2[0]);
+        
+        //VIEW
+        JPanel viewpanel = new JPanel();
+        JLabel v_label = new JLabel("SEARCH HISTORY [OwO ]");
+        viewpanel.add(v_label);
+
+        DefaultListModel<String> v_history = new DefaultListModel<String>();
+
+        JList<String> v_list = new JList<String>(v_history);
+        v_list.setSelectionMode(0);
+        v_list.setLayoutOrientation(JList.VERTICAL);
+        v_list.setVisibleRowCount(5);
+
+        JScrollPane vsp = new JScrollPane(v_list);
+        vsp.setPreferredSize(new Dimension(500,600));
+        viewpanel.add(v_list);
+
+        cards.add(viewpanel, options2[1]);
+
+        //ADD
+        JPanel addpanel = new JPanel();
+        JPanel a_p1 = new JPanel();
+        JPanel a_p2 = new JPanel();
+
+        JLabel a_label = new JLabel("ADD A SLANG WORD ");
+        addpanel.add(a_label);
+        
+        JLabel a_label1 = new JLabel("Enter slang word: ");
+        JTextField a_text1 = new JTextField();
+        a_text1.setMaximumSize(new Dimension(500,30)); 
+        a_p1.add(a_label1);
+        a_p1.add(a_text1);
+        a_p1.setLayout(new BoxLayout(a_p1, BoxLayout.X_AXIS));
+        
+        JLabel a_label2 = new JLabel("Enter definition: ");
+        JTextField a_text2 = new JTextField();
+        a_text2.setMaximumSize(new Dimension(510,30));
+        a_p2.add(a_label2);
+        a_p2.add(a_text2);
+        a_p2.setLayout(new BoxLayout(a_p2, BoxLayout.X_AXIS));
+        
+        JButton a_confirm_btn = new JButton("CONFIRM");
+        
+        addpanel.add(a_p1);
+        addpanel.add(a_p2);
+        addpanel.add(a_confirm_btn);
+
+        addpanel.setLayout(new BoxLayout(addpanel, BoxLayout.Y_AXIS));
+
+        cards.add(addpanel, options2[2]);
+
+        //EDIT
+        JPanel editpanel = new JPanel();
+        JPanel e_p1 = new JPanel();
+
+        JLabel e_label = new JLabel("EDIT A SLANG WORD ");
+        editpanel.add(e_label);
+
+        JLabel e_label1 = new JLabel("Enter slang word: ");
+        JTextField e_text = new JTextField();
+        e_text.setMaximumSize(new Dimension(500,30));
+        e_p1.add(e_label1);
+        e_p1.add(e_text);
+        e_p1.setLayout(new BoxLayout(e_p1, BoxLayout.X_AXIS));
+
+        JButton e_confirm_btn = new JButton("CONFIRM");
+        
+        editpanel.add(e_p1);
+        editpanel.add(e_confirm_btn);
+
+        JPanel e_result = new JPanel();
+
+        DefaultListModel<String> e_model = new DefaultListModel<String>();
+         
+        JList<String> e_list = new JList<String>(e_model);
+        e_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        e_list.setLayoutOrientation(JList.VERTICAL);
+        e_list.setSelectedIndex(0);
+        e_list.setVisibleRowCount(5);
+        e_list.setVisible(true);
+
+        JScrollPane esp = new JScrollPane(e_list);
+        esp.setPreferredSize(new Dimension(500,500));
+        e_result.add(esp);
+
+        editpanel.add(e_result);
+
+        editpanel.setLayout(new BoxLayout(editpanel, BoxLayout.Y_AXIS));
+
+        cards.add(editpanel, options2[3]);
+
+        //DELETE
+        JPanel deletepanel = new JPanel();
+        JPanel d_p1 = new JPanel();
+
+        JLabel d_label = new JLabel("DELETE A SLANG WORD ");
+        deletepanel.add(d_label);
+
+        JLabel d_label1 = new JLabel("Enter slang word: ");
+        JTextField d_text = new JTextField();
+        d_text.setMaximumSize(new Dimension(500,30)); 
+        d_p1.add(d_label1);
+        d_p1.add(d_text);
+        d_p1.setLayout(new BoxLayout(d_p1, BoxLayout.X_AXIS));
+
+        JButton d_confirm_btn = new JButton("CONFIRM");
+        
+        deletepanel.add(d_p1);
+        deletepanel.add(d_confirm_btn);
+
+        deletepanel.setLayout(new BoxLayout(deletepanel, BoxLayout.Y_AXIS));
+
+        cards.add(deletepanel, options2[4]);
+
+        //RANDOM
+        JPanel randompanel = new JPanel();
+        JLabel r_label = new JLabel(" ON THIS DAY SLANG WORD (^o^)/ ");
+        randompanel.add(r_label);
+
+        JTextField r_text = new JTextField();
+        r_text.setMaximumSize(new Dimension(500,30)); 
+        
+        randompanel.add(r_text);
+        //randompanel.setLayout(new BoxLayout(randompanel, BoxLayout.Y_AXIS));
+
+        cards.add(randompanel, options2[6]);
+
+        //MNG1
+        JPanel mng1panel = new JPanel();
+        JLabel m1_label = new JLabel(" MINIGAME 1 (^o^)/ ");
+        mng1panel.add(m1_label);
+
+        JTextField m1_text = new JTextField();
+        m1_text.setMaximumSize(new Dimension(500,30)); 
+        
+        mng1panel.add(m1_text);
+
+        cards.add(mng1panel, options2[7]);
+
+        //MNG2
+        JPanel mng2panel = new JPanel();
+        JLabel m2_label = new JLabel(" MINIGAME 2 (^o^)/ ");
+        mng2panel.add(m2_label);
+
+        JTextField m2_text = new JTextField();
+        m2_text.setMaximumSize(new Dimension(500,30)); 
+        
+        mng2panel.add(m2_text);
+
+        cards.add(mng2panel, options2[8]);
+
+        //BUTTONS
+        JPanel buttons = new JPanel();
+
+        JButton search_btn = new JButton(options2[0]);
+        search_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(search_btn);
+
+        JButton view_btn = new JButton(options2[1]);
+        view_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(view_btn);
+
+        JButton add_btn = new JButton(options2[2]);
+        add_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(add_btn);
+
+        JButton edit_btn = new JButton(options2[3]);
+        edit_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(edit_btn);
+                
+        JButton delete_btn = new JButton(options2[4]);
+        delete_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(delete_btn);
+
+        JButton reset_btn = new JButton(options2[5]);
+        reset_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(reset_btn);
+
+        JButton random_btn = new JButton(options2[6]);
+        random_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(random_btn);
+
+        JButton mng1_btn = new JButton(options2[7]);
+        mng1_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(mng1_btn);
+
+        JButton mng2_btn = new JButton(options2[8]);
+        mng2_btn.setMaximumSize(new Dimension(200,50));
+        buttons.add(mng2_btn);
+
+        s_confirm_btn.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                s_model.clear();
+                String t = s_text.getText();
+                if (!t.equals("")){
+                    if (scb.getSelectedIndex()==0){
+                        ArrayList<ArrayList<String>> aa = sd.searchWord(t);
+                        if (aa!=null){
+                            for (ArrayList<String> a:aa){
+                                for (String s:a){
+                                    s_model.addElement(s);
+                                }
+                            }
+                        }
+                        else{
+                            //noti not found
+                        }
+                    }
+                    else if(scb.getSelectedIndex()==1){
+                        sd.searchDefinition(t);
+                        Set<String> aa = sd.searchDefinition(t);
+                        if (aa!=null){
+                            for (String s:aa){
+                                    s_model.addElement(s);
+                                }
+                            }
+                        }
+                        else{
+                            //noti not found
+                        }
+                    }
+                else{
+                    //noti pls enter sth
+                }
+            }
+        });
+
+        search_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,options2[0]);
+            }
+        });
+
+        view_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                v_history.clear();
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,options2[1]);
+
+                HashMap<String,ArrayList<ArrayList<String>>> hm = sd.viewSearchHistory();
+                if (hm!=null){
+                    for (String k:hm.keySet()){
+                        for (ArrayList<String> aa:hm.get(k)){
+                            String s = k + " : ";
+                            for (String a:aa){
+                                s+=a+"| ";
+                            }
+                            v_history.addElement(s);
+                        }
+                    }
+                }
+            }
+        });
+
+        add_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,options2[2]);
+
+                //doStuff();
+            }
+        });
+
+        edit_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,options2[3]);
+                
+                //doStuff();
+            }
+        });
+        
+        delete_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,options2[4]);
+                
+                //doStuff();
+            }
+        });
+
+        reset_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                sd.inputDict(fi);
+                JFrame noti = new JFrame("Notification");
+                JOptionPane.showMessageDialog(noti, "List is reset!! <0A0 >");
+                try{
+                    sd.outputDict(fo);
+        
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        random_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,options2[6]);
+                
+                //doStuff();
+            }
+        });
+
+        mng1_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,options2[7]);
+                
+                //doStuff();
+            }
+        });
+
+        mng2_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,options2[8]);
+                
+                //doStuff();
+            }
+        });
+
+        //
+
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
+
+
+        //event?
+        // MyBtnListener ml = new MyBtnListener();
+
+        // ccbtn.setPreferredSize(null);
+        // ccbtn.setActionCommand(null);
+        // ccbtn.addActionListener(ml);
+        // ccbtn.addActionListener("CANCEL");
+
+
+        //pane.add(searchpanel, BorderLayout.WEST);
+        pane.add(cards, BorderLayout.CENTER);
+        pane.add(buttons, BorderLayout.EAST);        
+    }
+
+    public void itemStateChanged(ItemEvent evt) 
+    {
+        // CardLayout cl = (CardLayout)(cards.getLayout());
+        // cl.show(cards, (String)evt.getItem());
+    }
+
+    private static void createAndShowGUI() 
+    {
+        JFrame.setDefaultLookAndFeelDecorated(true);
+
+        JFrame frame = new JFrame("Slang Dictionary");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+
+        DApp demo = new DApp();
+        demo.addComponentToPane(frame.getContentPane());
+
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    DApp() {
+        sd = new slangDict();
+    }
+
+    public static void main(String args[]) throws IOException{
+        //ConsoleUI();
+
+        javax.swing.SwingUtilities.invokeLater(new Runnable() 
+        {
+           public void run() 
+           {
+            createAndShowGUI();
+           }
+        });
     }
 }
