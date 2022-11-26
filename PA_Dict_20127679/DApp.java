@@ -185,13 +185,14 @@ public class DApp implements ItemListener{
         DefaultListModel<String> v_history = new DefaultListModel<String>();
 
         JList<String> v_list = new JList<String>(v_history);
-        v_list.setSelectionMode(0);
         v_list.setLayoutOrientation(JList.VERTICAL);
         v_list.setVisibleRowCount(5);
 
         JScrollPane vsp = new JScrollPane(v_list);
-        vsp.setPreferredSize(new Dimension(500,600));
-        viewpanel.add(v_list);
+        vsp.setPreferredSize(new Dimension(500,500));
+        viewpanel.add(vsp);
+
+        viewpanel.setLayout(new BoxLayout(viewpanel, BoxLayout.Y_AXIS));
 
         cards.add(viewpanel, options2[1]);
 
@@ -251,11 +252,8 @@ public class DApp implements ItemListener{
         DefaultListModel<String> e_model = new DefaultListModel<String>();
          
         JList<String> e_list = new JList<String>(e_model);
-        e_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         e_list.setLayoutOrientation(JList.VERTICAL);
-        e_list.setSelectedIndex(0);
         e_list.setVisibleRowCount(5);
-        e_list.setVisible(true);
 
         JScrollPane esp = new JScrollPane(e_list);
         esp.setPreferredSize(new Dimension(500,500));
@@ -383,6 +381,8 @@ public class DApp implements ItemListener{
                         }
                         else{
                             //noti not found
+                            JFrame noti = new JFrame("Notification");
+                            JOptionPane.showMessageDialog(noti, "This slang is not in this dictionary (UmU)...");     
                         }
                     }
                     else if(scb.getSelectedIndex()==1){
@@ -390,16 +390,19 @@ public class DApp implements ItemListener{
                         Set<String> aa = sd.searchDefinition(t);
                         if (aa!=null){
                             for (String s:aa){
-                                    s_model.addElement(s);
-                                }
+                                s_model.addElement(s);
                             }
                         }
                         else{
                             //noti not found
+                            JFrame noti = new JFrame("Notification");
+                            JOptionPane.showMessageDialog(noti, "We can not find the definition in this dictionary (UmU)...");
                         }
                     }
-                else{
+                }else{
                     //noti pls enter sth
+                    JFrame noti = new JFrame("Notification");
+                    JOptionPane.showMessageDialog(noti, "The text field is empty! Please enter something (UmU)...");
                 }
             }
         });
@@ -430,6 +433,9 @@ public class DApp implements ItemListener{
                             v_history.addElement(s);
                         }
                     }
+                }else{
+                    JFrame noti = new JFrame("Notification");
+                    JOptionPane.showMessageDialog(noti, "You haven't searched any slangs (ehe)>[UwU ]");
                 }
             }
         });

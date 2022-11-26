@@ -100,7 +100,7 @@ public class slangDict {
         return dictionary.containsKey(word);
     }
 
-    public boolean searchWord(String word){
+    public ArrayList<ArrayList<String>> searchWord(String word){
         if (foundWord(word)){
             System.out.println("    Definition [OwO ]   :");
             String s="";
@@ -114,13 +114,14 @@ public class slangDict {
             System.out.println(s);
 
             history.put(word, aa);
-            return true;
+            return aa;
         }
-        return false;
+        System.out.println("This slang is not in this dictionary (UmU)...\n");
+        return null;
     }
 
     //search by definition
-    public void searchDefinition(String definition){
+    public Set<String> searchDefinition(String definition){
         boolean check = false;
         HashMap<String,ArrayList<ArrayList<String>>> result = new HashMap<>();
 
@@ -142,18 +143,20 @@ public class slangDict {
                 System.out.println(a.getKey()+"\n");
                 history.put(a.getKey(), a.getValue());
             }
+            return result.keySet();
         }
         else{
             System.out.println("We can not find the definition in this dictionary (UmU)...\n");
+            return null;
         }
     }
 
     //show search history 
-    public void viewSearchHistory(){
+    public HashMap<String,ArrayList<ArrayList<String>>> viewSearchHistory(){
         System.out.println("    Search History [OwO ]   :");
         if (history.keySet().size() == 0){
             System.out.println("You haven't searched any slangs (ehe)>[UwU ]\n");
-            return;
+            return null;
         }
         for (String word:history.keySet()){
             ArrayList<ArrayList<String>> aa = history.get(word);
@@ -169,6 +172,7 @@ public class slangDict {
             }
         }
         System.out.println();
+        return history;
     }
 
     //add slang --> check condition: overwrite/duplicate
@@ -428,7 +432,7 @@ public class slangDict {
     }
 
     //reset slang list
-    public void resetDict() throws IOException{
+    public void resetDict(){
         System.out.println("Do you want to reset the dictionary? Enter 1 for Yes, other numbers for No: ");   
         int opt = input.nextInt();
         if (opt!=1){
@@ -436,7 +440,11 @@ public class slangDict {
         } 
         inputDict(fi); 
         System.out.println("List is reset!! <0A0 >\n");   
-        outputDict(fo);
+        try{
+            outputDict(fo);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     //random slang (On this day slang word)
@@ -449,7 +457,7 @@ public class slangDict {
         return String.valueOf(set[idx]);
     }
 
-    public void randomSlang(){
+    public void randomSlang(){ //note random array also
         String slang = randomS();
         System.out.println("    On this day slang word (^o^)/   :");
         System.out.println(" Slang: "+String.valueOf(slang));
