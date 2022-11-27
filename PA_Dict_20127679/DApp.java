@@ -171,11 +171,11 @@ public class DApp implements ItemListener{
         s_list.setVisible(true);
 
         JScrollPane ssp = new JScrollPane(s_list);
-        ssp.setPreferredSize(new Dimension(500,500));
+        ssp.setPreferredSize(new Dimension(1000,300));
         s_result.add(ssp);
 
         searchpanel.add(s_result);
-
+        
         cards = new JPanel(new CardLayout());
         cards.add(searchpanel, options2[0]);
         
@@ -183,6 +183,7 @@ public class DApp implements ItemListener{
         JPanel viewpanel = new JPanel();
         JLabel v_label = new JLabel("SEARCH HISTORY [OwO ]");
         viewpanel.add(v_label);
+        v_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         DefaultListModel<String> v_history = new DefaultListModel<String>();
 
@@ -191,7 +192,7 @@ public class DApp implements ItemListener{
         v_list.setVisibleRowCount(5);
 
         JScrollPane vsp = new JScrollPane(v_list);
-        vsp.setPreferredSize(new Dimension(500,500));
+        vsp.setPreferredSize(new Dimension(500,400));
         viewpanel.add(vsp);
 
         viewpanel.setLayout(new BoxLayout(viewpanel, BoxLayout.Y_AXIS));
@@ -227,6 +228,7 @@ public class DApp implements ItemListener{
         addpanel.add(a_confirm_btn);
 
         addpanel.setLayout(new BoxLayout(addpanel, BoxLayout.Y_AXIS));
+        addpanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         cards.add(addpanel, options2[2]);
 
@@ -255,6 +257,7 @@ public class DApp implements ItemListener{
         editpanel.add(e_confirm_btn);
 
         editpanel.setLayout(new BoxLayout(editpanel, BoxLayout.Y_AXIS));
+        editpanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         cards.add(editpanel, options2[3]);
 
@@ -278,18 +281,18 @@ public class DApp implements ItemListener{
         deletepanel.add(d_confirm_btn);
 
         deletepanel.setLayout(new BoxLayout(deletepanel, BoxLayout.Y_AXIS));
+        deletepanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         cards.add(deletepanel, options2[4]);
 
         //RANDOM
         JPanel randompanel = new JPanel();
         JLabel r_label = new JLabel(" ON THIS DAY SLANG WORD (^o^)/ ");
+        r_label.setAlignmentX(Component.CENTER_ALIGNMENT);
         randompanel.add(r_label);
-
-        JPanel r_result = new JPanel();
-
+        
         JLabel r_text = new JLabel();
-        r_result.add(r_text);
+        randompanel.add(r_text);
 
         DefaultListModel<String> r_model = new DefaultListModel<String>();
          
@@ -298,10 +301,9 @@ public class DApp implements ItemListener{
         r_list.setVisibleRowCount(5);
 
         JScrollPane rsp = new JScrollPane(r_list);
-        rsp.setPreferredSize(new Dimension(500,500));
-        r_result.add(rsp);
+        rsp.setPreferredSize(new Dimension(500,400));
 
-        randompanel.add(r_result);
+        randompanel.add(rsp);
 
         randompanel.setLayout(new BoxLayout(randompanel, BoxLayout.Y_AXIS));
         
@@ -311,25 +313,98 @@ public class DApp implements ItemListener{
         JPanel mng1panel = new JPanel();
         JLabel m1_label = new JLabel(" MINIGAME 1 (^o^)/ ");
         mng1panel.add(m1_label);
+        m1_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JTextField m1_text = new JTextField();
-        m1_text.setMaximumSize(new Dimension(500,30)); 
+        JPanel m1_word = new JPanel();
+        JLabel m1_text1 = new JLabel(" (._. ) < Slang:");
+        m1_text1.setMaximumSize(new Dimension(500,30)); 
         
-        mng1panel.add(m1_text);
+        JLabel m1_text2 = new JLabel();
+        m1_text2.setMaximumSize(new Dimension(500,30));
+        
+        m1_word.add(m1_text1);
+        m1_word.add(m1_text2);
+        m1_word.setAlignmentX(Component.CENTER_ALIGNMENT);//
+        mng1panel.add(m1_word);
 
+        JLabel m1_text3 = new JLabel(" ( ._.) < Guess the definition of the slang!");
+        m1_text3.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mng1panel.add(m1_text3);
+
+        JButton m1_b1 = new JButton();
+        JButton m1_b2 = new JButton();
+        JButton m1_b3 = new JButton();
+        JButton m1_b4 = new JButton();
+
+        JPanel m1_btn = new JPanel(new GridLayout(2,2,50,10));
+        m1_btn.add(m1_b1);
+        m1_btn.add(m1_b2);
+        m1_btn.add(m1_b3);
+        m1_btn.add(m1_b4);
+
+        mng1panel.add(m1_btn);
+
+        JLabel m1_text4 = new JLabel("( -_-) zzZ  Waiting for your selection... ");
+        m1_text4.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mng1panel.add(m1_text4);
+
+        JLabel m1_text5 = new JLabel("Click on [Minigame 1] to try another quiz~ ( ~_~)");
+        m1_text5.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mng1panel.add(m1_text5);
+
+        mng1panel.setLayout(new BoxLayout(mng1panel, BoxLayout.Y_AXIS));
         cards.add(mng1panel, options2[7]);
+
+        DefaultListModel<String> mng1_model = new DefaultListModel<String>();
 
         //MNG2
         JPanel mng2panel = new JPanel();
         JLabel m2_label = new JLabel(" MINIGAME 2 (^o^)/ ");
         mng2panel.add(m2_label);
+        m2_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JTextField m2_text = new JTextField();
-        m2_text.setMaximumSize(new Dimension(500,30)); 
+        JPanel m2_word = new JPanel();
+        JLabel m2_text1 = new JLabel(" (._. ) < Definition:");
+        m2_text1.setMaximumSize(new Dimension(500,30));
+
+        JLabel m2_text2 = new JLabel();
+        m2_text2.setMaximumSize(new Dimension(500,30));
         
-        mng2panel.add(m2_text);
+        m2_word.add(m2_text1);
+        m2_word.add(m2_text2);
+        mng2panel.add(m2_word);
+        m2_word.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel m2_text3 = new JLabel(" ( ._.) < Guess the slang!");
+        m2_text3.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mng2panel.add(m2_text3);
+
+        JButton m2_b1 = new JButton();
+        JButton m2_b2 = new JButton();
+        JButton m2_b3 = new JButton();
+        JButton m2_b4 = new JButton();
+
+        JPanel m2_btn = new JPanel(new GridLayout(2,2,50,10));
+        m2_btn.add(m2_b1);
+        m2_btn.add(m2_b2);
+        m2_btn.add(m2_b3);
+        m2_btn.add(m2_b4);
+
+        mng2panel.add(m2_btn);
+
+        JLabel m2_text4 = new JLabel("( -_-) zzZ  Waiting for your selection... ");
+        m2_text4.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mng2panel.add(m2_text4);
+
+        JLabel m2_text5 = new JLabel("Click on [Minigame 2] to try another quiz~ ( ~_~)");
+        m2_text5.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mng2panel.add(m2_text5);
+
+        mng2panel.setLayout(new BoxLayout(mng2panel, BoxLayout.Y_AXIS));
 
         cards.add(mng2panel, options2[8]);
+
+        DefaultListModel<String> mng2_model = new DefaultListModel<String>();
 
         //BUTTONS
         JPanel buttons = new JPanel();
@@ -532,7 +607,7 @@ public class DApp implements ItemListener{
                         case 2:
                         {
                             try{
-                                sd.duplicate(w, idx);
+                                sd.duplicate(w, d, idx);
                                 JOptionPane.showMessageDialog(n, "Updated!! {~_~ }");
                             }
                             catch(Exception e){
@@ -837,14 +912,74 @@ public class DApp implements ItemListener{
                 }
             }
         });
-
+        
+        
         mng1_btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,options2[7]);
+                mng1_model.clear();
+                                
+                m1_text4.setText("( -_-) zzZ  Waiting for your selection... ");
+                String slang = sd.randomS();
+                m1_text2.setText(slang);
                 
-                //doStuff();
+                //prepare data;
+                HashMap<String,ArrayList<String>> hm = new HashMap<>();
+                hm.put(slang,sd.randomD(slang));
+                
+                for(int i=0;i<3;i++){
+                    String s = sd.randomS();
+                    hm.put(s,sd.randomD(s));
+                }
+
+                ArrayList<String> al = new ArrayList<>();
+                for(String k:hm.keySet()){
+                    ArrayList<String> a = hm.get(k);
+                    String str="";
+                    for(String s:a){
+                        str+=s + "; ";
+                    }
+                    al.add(str);
+                    mng1_model.addElement(k);
+                }                
+
+                //display
+                m1_b1.setText(al.get(0));
+                m1_b2.setText(al.get(1));
+                m1_b3.setText(al.get(2));
+                m1_b4.setText(al.get(3));
+                
+                //JFrame noti = new JFrame("Notification");
+
+                ActionListener buttonL = new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        Object o = arg0.getSource();
+                        int i=-1;
+                        if (o==m1_b1) i = 0;
+                        if (o==m1_b2) i = 1;
+                        if (o==m1_b3) i = 2;
+                        if (o==m1_b4) i = 3;
+
+                        if (i!=-1){
+                            if (m1_text2.getText().equals(mng1_model.get(i))){
+                                m1_text4.setText("( ._.) < Correct answer! Have a candy >(__)<");
+                                //JOptionPane.showMessageDialog(noti, "( ._.) < Correct answer! Have a candy >( )<");
+                            }
+                            else{
+                                m1_text4.setText("(._. ) < Wrong answer!!");
+                                //JOptionPane.showMessageDialog(noti, "(._. ) < Wrong answer!!");
+                            }
+                        }
+                    }
+                };
+
+                m1_b1.addActionListener(buttonL);
+                m1_b2.addActionListener(buttonL);
+                m1_b3.addActionListener(buttonL);
+                m1_b4.addActionListener(buttonL);
             }
         });
 
@@ -853,8 +988,66 @@ public class DApp implements ItemListener{
             public void actionPerformed(ActionEvent arg0) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,options2[8]);
+                mng2_model.clear();
                 
-                //doStuff();
+                //prepare data;
+                m2_text4.setText("( -_-) zzZ  Waiting for your selection... ");
+                
+                String slang = sd.randomS();
+                ArrayList<String> definition = sd.randomD(slang);
+                ArrayList<String> al = new ArrayList<>();
+                al.add(slang);
+                mng2_model.addElement(slang);
+
+                for(int i=0;i<3;i++){
+                    al.add(sd.randomS());
+                }
+
+                Collections.shuffle(al);
+
+                String str = "";
+                for(String s:definition){
+                    str+=s + "; ";
+                }
+                m2_text2.setText(str);
+                                
+                ArrayList<String> d = new ArrayList<>();
+                for(String a:al){
+                    d.add(a);
+                    mng2_model.addElement(a); 
+                }
+
+                //display
+                m2_b1.setText(d.get(0));
+                m2_b2.setText(d.get(1));
+                m2_b3.setText(d.get(2));
+                m2_b4.setText(d.get(3));
+                
+                ActionListener buttonL2 = new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        Object o = arg0.getSource();
+                        int i=-1;
+                        if (o==m2_b1) i = 1;
+                        if (o==m2_b2) i = 2;
+                        if (o==m2_b3) i = 3;
+                        if (o==m2_b4) i = 4;
+                        
+                        if (i!=-1){
+                            if (mng2_model.get(i).equals(mng2_model.get(0))){
+                                m2_text4.setText("( ._.) < Correct answer! Have a candy >(__)<");
+                            }
+                            else{
+                                m2_text4.setText("(._. ) < Wrong answer!!");
+                            }
+                        }
+                    }
+                };
+
+                m2_b1.addActionListener(buttonL2);
+                m2_b2.addActionListener(buttonL2);
+                m2_b3.addActionListener(buttonL2);
+                m2_b4.addActionListener(buttonL2);
             }
         });
 

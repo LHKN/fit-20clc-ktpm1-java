@@ -300,12 +300,9 @@ public class slangDict {
         return true;    
     }
     
-    public void duplicate(String word, int idx) throws IOException{
-        //deep copy
+    public void duplicate(String word, String definition, int idx) throws IOException{
         ArrayList<String> na = new ArrayList<>();
-        for (String a:dictionary.get(word).get(idx)){
-            na.add(a);
-        }
+        na.add(definition);
         dictionary.get(word).add(na);
         
         System.out.println("Duplicated!! {~_~ } \n");
