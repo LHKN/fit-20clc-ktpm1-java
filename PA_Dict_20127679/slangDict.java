@@ -442,6 +442,43 @@ public class slangDict {
         }
     }
 
+    // swing ver
+    public boolean checkMult(String word, int idx){
+       return dictionary.get(word).get(idx).size()>1;
+    }
+
+    public void editWord(String word, String nw, int idx) throws IOException{
+        if(dictionary.get(word).size()>1){
+            ArrayList<ArrayList<String>> d = new ArrayList<>();
+            //deep copy
+            ArrayList<String> na = new ArrayList<>();
+            for (String a:dictionary.get(word).get(idx)){
+                na.add(a);
+            }
+
+            d.add(na);
+            dictionary.get(word).remove(idx);
+            dictionary.put(nw,d);
+            System.out.println("Updated!! {~_~ } \n");
+            outputDict(fo);
+            return;
+        }
+        else{
+            dictionary.put(nw,dictionary.get(word));
+            dictionary.remove(word);
+            System.out.println("Updated!! {~_~ } \n");
+            outputDict(fo);
+            return;
+        }
+    }
+
+    public void editDefinition(String word, String nw, int idx, int n) throws IOException{
+        dictionary.get(word).get(idx).set(n, nw);
+        System.out.println("Updated!! {~_~ } \n");
+        outputDict(fo);
+        return;
+    }
+
     //delete slang --> need confirm
     public void deleteSlang(String word) throws IOException{
         if(foundWord(word)){

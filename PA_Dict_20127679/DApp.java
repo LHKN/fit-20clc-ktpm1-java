@@ -139,7 +139,9 @@ public class DApp implements ItemListener{
     JPanel cards;
     String options1[] = {"Search by slang word","Search by definition"};
     String options2[] = {"Search slang","View search history","Add Slang","Edit Slang","Delete Slang","Reset List","Random Slang","Minigame 1","Minigame 2"};
-    
+    String options3[] = {"Edit slang word","Edit definition"};
+    Object[] options4 = {"Confirm","Cancel"};
+  
     public void addComponentToPane(Container pane){
         //SEARCH
         JPanel searchpanel = new JPanel();
@@ -242,24 +244,15 @@ public class DApp implements ItemListener{
         e_p1.add(e_text);
         e_p1.setLayout(new BoxLayout(e_p1, BoxLayout.X_AXIS));
 
+        JComboBox<String> ecb = new JComboBox<String>(options3);
+        ecb.setMaximumSize(new Dimension(200,30));
+        ecb.setEditable(false);
+
         JButton e_confirm_btn = new JButton("CONFIRM");
         
         editpanel.add(e_p1);
+        editpanel.add(ecb);
         editpanel.add(e_confirm_btn);
-
-        JPanel e_result = new JPanel();
-
-        DefaultListModel<String> e_model = new DefaultListModel<String>();
-         
-        JList<String> e_list = new JList<String>(e_model);
-        e_list.setLayoutOrientation(JList.VERTICAL);
-        e_list.setVisibleRowCount(5);
-
-        JScrollPane esp = new JScrollPane(e_list);
-        esp.setPreferredSize(new Dimension(500,500));
-        e_result.add(esp);
-
-        editpanel.add(e_result);
 
         editpanel.setLayout(new BoxLayout(editpanel, BoxLayout.Y_AXIS));
 
@@ -482,7 +475,7 @@ public class DApp implements ItemListener{
                         ArrayList<ArrayList<String>> old = sd.getDefinition(w);
                         
                         for (ArrayList<String> a:old){
-                            String str="";
+                            String str=w+": ";
                             for (String s:a){
                                 str+=s+"; ";
                             }
@@ -490,19 +483,18 @@ public class DApp implements ItemListener{
                             aa.add(str);
                         }
 
-                        Object[] options2 = {"Confirm","Cancel"};
-                        int ii = JOptionPane.showOptionDialog(noti, new Object[]{"The entered slang is duplicated. Please select the slang you want to work with:",a_result}, "Options", 0, 0, null, options2, null);
+                        int ii = JOptionPane.showOptionDialog(noti, new Object[]{"The entered slang is duplicated. Please select the slang you want to work with:",a_result}, "Options", 0, 0, null, options4, null);
                         if (ii == 0){
                             idx = a_list.getSelectedIndex();
                         }
                     }
 
+                    JFrame n = new JFrame("Notification");
                     switch (i){
                         case 0:
                         {
                             try{
                                 sd.overwrite(w, d, idx);
-                                JFrame n = new JFrame("Notification");
                                 JOptionPane.showMessageDialog(n, "Updated!! {~_~ }");
                             }
                             catch(Exception e){
@@ -514,7 +506,6 @@ public class DApp implements ItemListener{
                         {
                             try{
                                 sd.append(w, d, idx);
-                                JFrame n = new JFrame("Notification");
                                 JOptionPane.showMessageDialog(n, "Updated!! {~_~ }");
                             }
                             catch(Exception e){
@@ -526,7 +517,6 @@ public class DApp implements ItemListener{
                         {
                             try{
                                 sd.duplicate(w, idx);
-                                JFrame n = new JFrame("Notification");
                                 JOptionPane.showMessageDialog(n, "Updated!! {~_~ }");
                             }
                             catch(Exception e){
@@ -564,13 +554,153 @@ public class DApp implements ItemListener{
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 String w = e_text.getText();
-
+                JFrame noti = new JFrame("Notification");
+                
                 if(w.equals("")){
-                    JFrame noti = new JFrame("Notification");
                     JOptionPane.showMessageDialog(noti, "The slang word text field is empty! Please enter something (UmU)...");
                     return;
                 }
+                
+                if(!sd.foundWord(w)){
+                    //noti not found
+                    JOptionPane.showMessageDialog(noti, "This slang is not in this dictionary (UmU)...");     
+                    return;
+                }
 
+                int idx = 0;
+                
+                JPanel e_result = new JPanel();
+
+                ArrayList<String> ea = new ArrayList<>();
+                DefaultListModel<String> e_model = new DefaultListModel<String>();
+                 
+                JList<String> e_list = new JList<String>(e_model);
+                e_list.setLayoutOrientation(JList.VERTICAL);
+                e_list.setVisibleRowCount(5);
+        
+                JScrollPane esp = new JScrollPane(e_list);
+                esp.setPreferredSize(new Dimension(500,500));
+                e_result.add(esp);
+
+                ArrayList<ArrayList<String>> old = sd.getDefinition(w);
+
+                if(sd.checkDup(w)){
+                    for (ArrayList<String> a:old){
+                        String str=w+": ";
+                        for (String s:a){
+                            str+=s+"; ";
+                        }
+                        e_model.addElement(str);
+                        ea.add(str);
+                    }
+
+                    int ii = JOptionPane.showOptionDialog(noti, new Object[]{"The entered slang is duplicated. Please select the slang you want to work with:",e_result}, "Options", 0, 0, null, options4, null);
+                    if (ii == 0){
+                        idx = e_list.getSelectedIndex();
+                    }
+                }
+                
+                switch(ecb.getSelectedIndex()){
+                    case 0: //edit word
+                    {
+                        int ii = JOptionPane.showOptionDialog(noti, new Object[]{"This will replace the slang word and keep the old definition. Proceed?"}, "Edit word", 0, 0, null, options4, null);
+                        if(ii!=0) return;
+
+                        String nw = JOptionPane.showInputDialog(noti, "Enter new slang word: ");
+
+                        if(nw.equals("")){
+                            JOptionPane.showMessageDialog(noti, "The text field is empty! Please enter something (UmU)...");
+                            return;
+                        }
+
+                        if(sd.foundWord(nw)){
+                            JOptionPane.showMessageDialog(noti, "The slang word already exists!! Please go to add slang if you want to duplicate it... {-_- }");
+                            return;
+                        }
+
+                        try{
+                            sd.editWord(w, nw, idx);
+                            JOptionPane.showMessageDialog(noti, "Updated!! {~_~ }");
+                            return;
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    case 1: //edit definition
+                    {
+                        int ii = JOptionPane.showOptionDialog(noti, new Object[]{"This will keep the old slang word and change the definition. Proceed?"}, "Edit word", 0, 0, null, options4, null);
+                        if(ii!=0) return;
+
+                        String d = JOptionPane.showInputDialog(noti, "Enter new definition: ");
+
+                        if(d.equals("")){
+                            JOptionPane.showMessageDialog(noti, "The text field is empty! Please enter something (UmU)...");
+                            return;
+                        }
+
+                        Object[] options1 = { "Overwrite definition", "Add to definition", "Cancel" };
+                        int i = JOptionPane.showOptionDialog(noti, "Would you like to: ", "Options", 0, 0, null, options1, null);
+                        if (i==3) return;
+
+
+                        switch (i){
+                            case 0:
+                            {
+                                int n = -1;
+                                if(sd.checkMult(w,idx)){
+                                    e_model.clear();
+                                    ArrayList<String> a = old.get(idx);
+                                        for (String s:a){
+                                            e_model.addElement(s);
+                                            ea.add(s);
+                                        }
+                                    }
+                                    int iii = JOptionPane.showOptionDialog(noti, new Object[]{"There are multiple definitions. Please select the definition you want to work with and click Confirm, or click Cancle to overwrite all:",e_result}, "Options", 0, 0, null, options4, null);
+                                    if (iii == 0){
+                                        n = e_list.getSelectedIndex();
+                                }
+
+                                if (n!=-1){
+                                    try{
+                                        sd.editDefinition(w, d, idx, n);
+                                        JOptionPane.showMessageDialog(noti, "Updated!! {~_~ }");
+                                        return;
+                                    }
+                                    catch(Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                }
+
+                                try{
+                                    sd.overwrite(w, d, idx);
+                                    JOptionPane.showMessageDialog(noti, "Updated!! {~_~ }");
+                                    return;
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                                break;
+                            } 
+                            case 1:
+                            {
+                                try{
+                                    sd.append(w, d, idx);
+                                    JOptionPane.showMessageDialog(noti, "Updated!! {~_~ }");
+                                    return;
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                                break;
+                            }
+                            default:
+                            return;
+                        }
+                    }
+                    default:
+                    return;
+                }
                 //doStuff();
             }
         });
@@ -586,7 +716,7 @@ public class DApp implements ItemListener{
         d_confirm_btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {  
-                String w = e_text.getText();
+                String w = d_text.getText();
 
                 if(w.equals("")){
                     JFrame noti = new JFrame("Notification");
