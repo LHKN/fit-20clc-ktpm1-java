@@ -516,6 +516,19 @@ public class slangDict {
         }
     }
 
+    //swing ver
+    public void delete(String word, int idx) throws IOException{
+        if(dictionary.get(word).size()>1){
+            dictionary.get(word).remove(idx);
+        }
+        else{
+            dictionary.remove(word);
+        }
+        //sortedDict.remove(word);
+        System.out.println("Slang is deleted! <OAO >\n"); 
+        outputDict(fo);  
+    }
+
     //reset slang list
     public void resetDict(){
         System.out.println("Do you want to reset the dictionary? Enter 1 for Yes, other numbers for No: ");   

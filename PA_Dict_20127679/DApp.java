@@ -487,6 +487,9 @@ public class DApp implements ItemListener{
                         if (ii == 0){
                             idx = a_list.getSelectedIndex();
                         }
+                        else{
+                            return;
+                        }
                     }
 
                     JFrame n = new JFrame("Notification");
@@ -597,6 +600,8 @@ public class DApp implements ItemListener{
                     int ii = JOptionPane.showOptionDialog(noti, new Object[]{"The entered slang is duplicated. Please select the slang you want to work with:",e_result}, "Options", 0, 0, null, options4, null);
                     if (ii == 0){
                         idx = e_list.getSelectedIndex();
+                    }else{
+                        return;
                     }
                 }
                 
@@ -701,7 +706,6 @@ public class DApp implements ItemListener{
                     default:
                     return;
                 }
-                //doStuff();
             }
         });
 
@@ -717,14 +721,65 @@ public class DApp implements ItemListener{
             @Override
             public void actionPerformed(ActionEvent arg0) {  
                 String w = d_text.getText();
+                JFrame noti = new JFrame("Notification");
 
                 if(w.equals("")){
-                    JFrame noti = new JFrame("Notification");
                     JOptionPane.showMessageDialog(noti, "The slang word text field is empty! Please enter something (UmU)...");
                     return;
                 }
 
-                //doStuff();
+                if(!sd.foundWord(w)){
+                    //noti not found
+                    JOptionPane.showMessageDialog(noti, "This slang is not in this dictionary (UmU)...");     
+                    return;
+                }
+                
+                int idx = 0;
+                
+                JPanel e_result = new JPanel();
+
+                ArrayList<String> ea = new ArrayList<>();
+                DefaultListModel<String> e_model = new DefaultListModel<String>();
+                 
+                JList<String> e_list = new JList<String>(e_model);
+                e_list.setLayoutOrientation(JList.VERTICAL);
+                e_list.setVisibleRowCount(5);
+        
+                JScrollPane esp = new JScrollPane(e_list);
+                esp.setPreferredSize(new Dimension(500,500));
+                e_result.add(esp);
+
+                ArrayList<ArrayList<String>> old = sd.getDefinition(w);
+
+                if(sd.checkDup(w)){
+                    for (ArrayList<String> a:old){
+                        String str=w+": ";
+                        for (String s:a){
+                            str+=s+"; ";
+                        }
+                        e_model.addElement(str);
+                        ea.add(str);
+                    }
+
+                    int i = JOptionPane.showOptionDialog(noti, new Object[]{"The entered slang is duplicated. Please select the slang you want to work with:",e_result}, "Options", 0, 0, null, options4, null);
+                    if (i == 0){
+                        idx = e_list.getSelectedIndex();
+                    }
+                    else{
+                        return;
+                    }
+                }
+
+                int i = JOptionPane.showOptionDialog(noti,"Do you want to delete this slang?", "Options", 0, 0, null, options4, null);
+                if(i==0){
+                    try{
+                        sd.delete(w, idx);
+                        JOptionPane.showMessageDialog(noti, "Slang is deleted! <OAO >");
+                        return;
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -825,5 +880,5 @@ public class DApp implements ItemListener{
            }
         });
     }
-    //main referenced from teacher's Beeper demonstration
+    //main referenced from teacher's Beeper demonstration (5%)
 }
