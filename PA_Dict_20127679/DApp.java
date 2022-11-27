@@ -286,12 +286,25 @@ public class DApp implements ItemListener{
         JLabel r_label = new JLabel(" ON THIS DAY SLANG WORD (^o^)/ ");
         randompanel.add(r_label);
 
-        JTextField r_text = new JTextField();
-        r_text.setMaximumSize(new Dimension(500,30)); 
-        
-        randompanel.add(r_text);
-        //randompanel.setLayout(new BoxLayout(randompanel, BoxLayout.Y_AXIS));
+        JPanel r_result = new JPanel();
 
+        JLabel r_text = new JLabel();
+        r_result.add(r_text);
+
+        DefaultListModel<String> r_model = new DefaultListModel<String>();
+         
+        JList<String> r_list = new JList<String>(r_model);
+        r_list.setLayoutOrientation(JList.VERTICAL);
+        r_list.setVisibleRowCount(5);
+
+        JScrollPane rsp = new JScrollPane(r_list);
+        rsp.setPreferredSize(new Dimension(500,500));
+        r_result.add(rsp);
+
+        randompanel.add(r_result);
+
+        randompanel.setLayout(new BoxLayout(randompanel, BoxLayout.Y_AXIS));
+        
         cards.add(randompanel, options2[6]);
 
         //MNG1
@@ -809,10 +822,19 @@ public class DApp implements ItemListener{
         random_btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
+                r_model.clear();
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,options2[6]);
                 
-                //doStuff();
+                String w = sd.randomS();
+                ArrayList<String> d = sd.randomD(w);
+
+                r_text.setText(w);
+                if (d!=null){
+                    for(String s:d){
+                        r_model.addElement(s); 
+                    }
+                }
             }
         });
 

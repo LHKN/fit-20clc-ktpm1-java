@@ -554,14 +554,12 @@ public class slangDict {
 
         return String.valueOf(set[idx]);
     }
-
+    
     public ArrayList<String> randomD(String word){
         int len = dictionary.get(word).size();
         int idx = rand.nextInt(len) - 1;
-    
-        ArrayList<String> a = dictionary.get(word).get(idx);
-
-        return a;
+        if (idx<1) return dictionary.get(word).get(0);
+        return dictionary.get(word).get(idx);
     }
 
     public void randomSlang(){
