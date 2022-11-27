@@ -555,20 +555,29 @@ public class slangDict {
         return String.valueOf(set[idx]);
     }
 
-    public void randomSlang(){ //note random array also
+    public ArrayList<String> randomD(String word){
+        int len = dictionary.get(word).size();
+        int idx = rand.nextInt(len) - 1;
+    
+        ArrayList<String> a = dictionary.get(word).get(idx);
+
+        return a;
+    }
+
+    public void randomSlang(){
         String slang = randomS();
+        ArrayList<String> a = randomD(slang);
+
         System.out.println("    On this day slang word (^o^)/   :");
         System.out.println(" Slang: "+String.valueOf(slang));
         System.out.println(" Definition: ");
         String s="";
-        ArrayList<ArrayList<String>> aa = dictionary.get(slang);
-        for (ArrayList<String> a:aa){
-            for (String d : a){
-                s+=d+"\n";
-            }
-        }
-        System.out.println(s);
 
+        for (String d : a){
+            s+=d+"\n";
+        }
+        
+        System.out.println(s);
     }
 
     //minigame: 1 slang 4 definition options
