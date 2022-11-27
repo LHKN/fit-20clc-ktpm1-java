@@ -582,27 +582,26 @@ public class slangDict {
     public void wordMinigame(){
         String slang = randomS();
 
-        HashMap<String,ArrayList<ArrayList<String>>> al = new HashMap<>();
-        al.put(slang,dictionary.get(slang));
+        HashMap<String,ArrayList<String>> al = new HashMap<>();
+        al.put(slang,randomD(slang));
 
         for(int i=0;i<3;i++){
             String s = randomS();
-            al.put(s,dictionary.get(s));
+            al.put(s,randomD(s));
         }
 
         //display quiz
         System.out.println("    (._. ) < Slang: "+slang);
         System.out.println("    ( ._.) < Guess the definition of the slang! Enter number from 1-4:");
         int count=0;
-        for(ArrayList<ArrayList<String>> aa:al.values()){
-            for(ArrayList<String> a:aa){
-                count+=1;
-                String str="";
-                for(String s:a){
-                    str+=s + "| ";
-                }
-                System.out.println(String.valueOf(count)+") "+str);
+
+        for(ArrayList<String> a:al.values()){
+            count+=1;
+            String str="";
+            for(String s:a){
+                str+=s + "| ";
             }
+            System.out.println(String.valueOf(count)+") "+str);
         }
 
         Object[] set = al.keySet().toArray();
@@ -618,7 +617,8 @@ public class slangDict {
     //minigame: 1 def 4 slang
     public void definitionMinigame(){
         String slang = randomS();
-        ArrayList<ArrayList<String>> definition = dictionary.get(slang);
+        ArrayList<String> definition = randomD(slang);
+
         ArrayList<String> al = new ArrayList<>();
         al.add(slang);
 
@@ -630,10 +630,8 @@ public class slangDict {
 
         //display quiz
         System.out.println("    (._. ) < Definition: ");
-        for(ArrayList<String> a:definition){
-            for(String s:a){
-                System.out.println(s);
-            }
+        for(String s:definition){
+            System.out.println(s);
         }
         System.out.println("    ( ._.) < Guess the slang! Enter number from 1-4:");
         int count=0;
