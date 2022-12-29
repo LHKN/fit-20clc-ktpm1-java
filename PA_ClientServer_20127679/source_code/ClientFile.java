@@ -14,7 +14,7 @@ public class ClientFile implements Runnable {
     public void run() {
         try {
             ws = FileSystems.getDefault().newWatchService();
-            Path directory = Path.of(c.pathDirectory);
+            Path directory = Path.of(c.getDirectory());
             WatchKey wk = directory.register(ws, StandardWatchEventKinds.ENTRY_CREATE,
                                                 StandardWatchEventKinds.ENTRY_DELETE,
                                                 StandardWatchEventKinds.ENTRY_MODIFY);
@@ -25,13 +25,13 @@ public class ClientFile implements Runnable {
                     WatchEvent.Kind<?> kind = event.kind();
 
                     if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                        String str = "New file has been created : " + fileName;
+                        String str = "ACTION: New file has been created : " + fileName;
                         c.sendToServer(str);
                     } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                        String str = "A file has been deleted : " + fileName;
+                        String str = "ACTION: A file has been deleted : " + fileName;
                         c.sendToServer(str);
                     } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                        String str = "A file has been modified : " + fileName;
+                        String str = "ACTION: A file has been modified : " + fileName;
                         c.sendToServer(str);
                     }
                 }

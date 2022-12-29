@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import javax.swing.JTree;
 
 public class ClientThread implements Runnable {
     private static String name;
@@ -8,9 +9,11 @@ public class ClientThread implements Runnable {
     private static boolean connecting = false;
 
     public static Thread t;
+    public static File selectedDirectory;
 
-    private static BufferedReader br;
-    private static BufferedWriter bw;
+    private BufferedReader br;
+    private BufferedWriter bw;
+    private DataInputStream dis;
 
     ClientThread(String name, int port, Socket s) {
         ClientThread.name = name;
@@ -32,8 +35,13 @@ public class ClientThread implements Runnable {
         connecting = check;
     }
 
+    public void setDirectory(File directory) {
+        selectedDirectory = directory;
+    }
+
     public void run() {
         try {
+            dis = new DataInputStream(s.getInputStream());
             br = new BufferedReader(new InputStreamReader(s.getInputStream()));
             bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
         } catch (IOException e) {
@@ -45,6 +53,7 @@ public class ClientThread implements Runnable {
         }
 
         try {
+            dis.close();
             br.close();
             bw.close();
             s.close();
@@ -53,7 +62,7 @@ public class ClientThread implements Runnable {
         }
     }
 
-    public String manageClient() {
+    public String manageClient() throws IOException, ClassNotFoundException{
         String rm = receiveFromClient();
         if (rm == null || rm.equals("CLIENT_DISCONNECT")) {
             setConnection(false);
@@ -77,21 +86,21 @@ public class ClientThread implements Runnable {
         }
     }
 
-    public String receiveFromClient() {
+    public String receiveFromClient() throws IOException, ClassNotFoundException {
         try {
             String receivedMessage = br.readLine();
+            if (receivedMessage.equals("SELECTED_DIRECTORY")){
+				//receive dir tree from client
+				receiveDirectory();                
+			}
             return receivedMessage;
         } catch (IOException e) {
             return null;
         }
     }
 
-    public String receiveDirectory() { // wip
-        try {
-            String receivedMessage = br.readLine();
-            return receivedMessage;
-        } catch (IOException e) {
-            return null;
-        }
+    public JTree receiveDirectory() throws IOException, ClassNotFoundException { // wip
+        ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
+        return (JTree)ois.readObject();
     }
 }

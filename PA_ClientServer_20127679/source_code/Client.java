@@ -7,14 +7,15 @@ import javax.swing.*;
 public class Client implements ItemListener {
 	static final int PORT = 3200;
 
-	public static String pathDirectory = "";
+	private static String pathDirectory = "";
 
-	public static Socket s;
-	private static Client c;
-	private static boolean connecting = false;
+	private Socket s;
+	private Client c;
+	private boolean connecting = false;
 
-	private static BufferedReader br;
-	private static BufferedWriter bw;
+	private BufferedReader br;
+	private BufferedWriter bw;
+	private DataOutputStream dos;
 
 	private static JFrame noti = new JFrame("Notification from Client");
 
@@ -22,8 +23,8 @@ public class Client implements ItemListener {
 		c = this;
 	}
 
-	public Socket getSocket() {
-		return s;
+	public String getDirectory() {
+		return pathDirectory;
 	}
 
 	public boolean checkConnection() {
@@ -169,19 +170,24 @@ public class Client implements ItemListener {
 							cl.show(cards, "connect");
 						}
 					}).start();
-					new Thread(new ClientFile(c)).start();
 				}
 			}
 		});
 	}
 
-	public static boolean connectToServer() {
+	public boolean connectToServer() {
 		try {
 			// initialize variables
 			// server's socket and IO streams
+			if (s != null){
+				s.close();
+			}
+
 			s = new Socket("localhost", PORT);
 
 			br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+
+			dos = new DataOutputStream(s.getOutputStream());
 			bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 
 			return true;
@@ -191,10 +197,11 @@ public class Client implements ItemListener {
 		}
 	}
 
-	public static void disconnectFromServer() {
+	public void disconnectFromServer() {
 		c.sendToServer("CLIENT_DISCONNECT");
 
 		try {
+			dos.close();
 			bw.close();
 			br.close();
 			s.close();
@@ -215,17 +222,33 @@ public class Client implements ItemListener {
 		}
 	}
 
-	public static String receiveFromServer() { //
+	public String receiveFromServer() { //
 		try {
 			String receivedMessage = br.readLine();
 			if (receivedMessage.equals("SELECTED_DIRECTORY")){
-				pathDirectory = br.readLine();
-				//send dir tree to server
-				System.out.println("pathDirectory: "+pathDirectory);
+				String tempPathDirectory = br.readLine();
+				if (!tempPathDirectory.equals(pathDirectory)){
+					pathDirectory = tempPathDirectory;
+					//send dir tree to server
+					sendDirectoryTree();
+					
+					//send notifications to server
+					new Thread(new ClientFile(c)).start();
+
+					System.out.println("pathDirectory: "+ pathDirectory);
+				}
 			}
 			return receivedMessage;
 		} catch (IOException e) {
 			return "";
 		}
 	}
+
+	public void sendDirectoryTree() throws IOException {
+        JTree model = new FileBrowser().getTree();
+
+        sendToServer("SELECTED_DIRECTORY");
+        ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+        oos.writeObject(model);
+    }
 }

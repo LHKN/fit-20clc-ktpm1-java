@@ -5,15 +5,25 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.filechooser.FileSystemView;
+
 
 public class Server implements ItemListener {
 	static final int PORT = 3200;
-	public static String pathDirectory = ""; //default temp directory C:\\Users\\sandy\\Downloads\\
+
+	private static int width;
+	private static int height;
 
 	private static HashMap<String, ClientThread> clientList;
 	private static ServerSocket ss;
 
 	private static String cur_name = null;
+
+	// provide nice icons and names for files
+    private FileSystemView fileSystemView;
+
+    // file-system tree 
+    private JTree tree;
 
 	private static JFrame noti = new JFrame("Notification from Server");
 
@@ -21,19 +31,21 @@ public class Server implements ItemListener {
 		clientList = new HashMap<>();
 	}
 
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				createAndShowGUI();
+				try{
+					createAndShowGUI();
+				}catch(IOException | ClassNotFoundException e){}
 			}
 		});
 	}
 
-	private static void createAndShowGUI() {
+	private static void createAndShowGUI() throws IOException, ClassNotFoundException{
 		// get monitor screen size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		int width = (int) Math.round(screenSize.getWidth());
-		// int height = (int)Math.round(screenSize.getHeight());
+		width = (int)Math.round(screenSize.getWidth());
+		height = (int)Math.round(screenSize.getHeight());
 
 		// set Container
 		JFrame.setDefaultLookAndFeelDecorated(true);
@@ -55,7 +67,7 @@ public class Server implements ItemListener {
 		// cl.show(states, (String)evt.getItem());
 	}
 
-	public void addComponentToPane(JFrame frame, Container pane) {
+	public void addComponentToPane(JFrame frame, Container pane) throws IOException, ClassNotFoundException{
 		// title
 		JPanel top = new JPanel();
 
@@ -101,7 +113,7 @@ public class Server implements ItemListener {
 		JPanel confirmed = new JPanel();
 
 		JPanel buttons = new JPanel();
-		JButton chat_btn = new JButton("CHAT");
+		JButton chat_btn = new JButton("CHAT LOG");
 		chat_btn.setMaximumSize(new Dimension(200, 50));
 
 		JButton directory_btn = new JButton("DIRECTORY");
@@ -227,7 +239,30 @@ public class Server implements ItemListener {
 				//    
 				if (chooser.showOpenDialog(d_select_panel) == JFileChooser.APPROVE_OPTION) { 
 					clientList.get(cur_name).sendToClient("SELECTED_DIRECTORY");
+
 					clientList.get(cur_name).sendToClient(String.valueOf(chooser.getSelectedFile()));
+
+					try{
+						tree = clientList.get(cur_name).receiveDirectory();
+
+						JFrame d_selected = new JFrame("View Selected Directory");
+
+						d_selected.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+						d_selected.setResizable(false);
+
+						Server s = new Server();
+						s.addComponentToPane(frame, frame.getContentPane());
+
+						d_selected.setLocation(width / 2, height / 2);
+						d_selected.pack();
+						d_selected.setVisible(true);
+
+						JPanel d_selected_panel = new JPanel();
+						d_selected_panel.add(tree);
+						d_selected.add(d_selected_panel);
+
+					}catch(IOException | ClassNotFoundException e){}
+					
 				}
 			}
 		});
@@ -267,16 +302,21 @@ public class Server implements ItemListener {
 								l_model.addElement(name);
 
 								new Thread(new Runnable() {
-									public void run() {
+									public void run(){
 										while (clientList.get(name).checkConnection()){
-											String rm = clientList.get(name).manageClient();
-											if (rm == null){
-												l_model.removeElement(name);
-												confirmed.setVisible(false);
-												clientList.get(name).setConnection(false);
-											}else{
-												c_receive_ta.setText(c_receive_ta.getText() + name + ": " + rm + "\n");
-											}			
+											try{
+												String rm = clientList.get(name).manageClient();
+												
+												if (rm == null){
+													l_model.removeElement(name);
+													confirmed.setVisible(false);
+													clientList.get(name).setConnection(false);
+												}else{
+													c_receive_ta.setText(c_receive_ta.getText() + name + ": " + rm + "\n");
+												}
+											}catch(IOException | ClassNotFoundException e){
+												e.printStackTrace();
+											}
 										}
 									}
 								}).start();
@@ -317,7 +357,7 @@ public class Server implements ItemListener {
 		}
 	}
 
-	public static ClientThread chooseClient(int port) {
-		return clientList.get(port);
+	public static ClientThread chooseClient(String name) {
+		return clientList.get(name);
 	}
 }
