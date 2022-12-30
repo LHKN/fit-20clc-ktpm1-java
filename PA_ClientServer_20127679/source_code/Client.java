@@ -18,6 +18,7 @@ public class Client implements ItemListener {
 	private DataOutputStream dos;
 
 	private static JFrame noti = new JFrame("Notification from Client");
+	private static JTextArea receiveMessage_ta;
 
 	Client() {
 		c = this;
@@ -87,7 +88,7 @@ public class Client implements ItemListener {
 		sendMessage.add(sendMessage_btn);
 
 		// connected: receive label
-		JTextArea receiveMessage_ta = new JTextArea(10, 10);
+		receiveMessage_ta = new JTextArea(10, 10);
 		receiveMessage_ta.setLineWrap(true);
 		receiveMessage_ta.setWrapStyleWord(true);
 		receiveMessage_ta.setEditable(false);

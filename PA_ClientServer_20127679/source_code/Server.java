@@ -24,6 +24,9 @@ public class Server implements ItemListener {
 
     // file-system tree 
     private JTree tree = null;
+	private static JTextArea c_receive_ta;
+	private static DefaultListModel<String> l_model;
+	private static JPanel confirmed;
 
 	private static JFrame noti = new JFrame("Notification from Server");
 
@@ -92,7 +95,7 @@ public class Server implements ItemListener {
 		// connected: select client from list
 		JPanel list = new JPanel();
 		
-		DefaultListModel<String> l_model = new DefaultListModel<String>();
+		l_model = new DefaultListModel<String>();
 
 		JList<String> l_list = new JList<String>(l_model);
         l_list.setLayoutOrientation(JList.VERTICAL);
@@ -110,7 +113,7 @@ public class Server implements ItemListener {
 
 		// connected: 
 		// CardLayout
-		JPanel confirmed = new JPanel();
+		confirmed = new JPanel();
 
 		JPanel buttons = new JPanel();
 		JButton chat_btn = new JButton("CHAT LOG");
@@ -141,7 +144,7 @@ public class Server implements ItemListener {
 
 
 		//chat: receive message
-		JTextArea c_receive_ta = new JTextArea(10,10);
+		c_receive_ta = new JTextArea(10,10);
 		c_receive_ta.setLineWrap(true);
 		c_receive_ta.setWrapStyleWord(true);
 		c_receive_ta.setEditable(false);
@@ -189,7 +192,7 @@ public class Server implements ItemListener {
 			public void actionPerformed(ActionEvent arg0) {
 				String temp = l_list.getSelectedValue();
 				
-				if (temp == null || clientList.get(temp) == null || !clientList.get(temp).checkConnection()) { //   	
+				if (temp == null || clientList.get(temp) == null) { //   	
 					confirmed.setVisible(false);
 					cur_name = null;
 					return;
@@ -240,23 +243,21 @@ public class Server implements ItemListener {
 				if (chooser.showOpenDialog(d_select_panel) == JFileChooser.APPROVE_OPTION) { 
 					clientList.get(cur_name).sendToClient("SELECTED_DIRECTORY");
 
-					System.out.println("pathDirectory: "+ chooser.getSelectedFile());
-
 					clientList.get(cur_name).setDirectory(chooser.getSelectedFile());
 					clientList.get(cur_name).sendToClient(String.valueOf(chooser.getSelectedFile()));
+
+					//c_receive_ta.setText(c_receive_ta.getText() + "SERVER ACTION: Loading directory " + chooser.getSelectedFile() + " of " + cur_name + "...\n");
 
 					// while (tree == null) {
 					// 	tree = clientList.get(cur_name).myTree();
 					// }
 
+					// TEMP TREE for debugging purposes
 					tree = new FileBrowser().getPreciseTree(chooser.getSelectedFile());
 
-					c_receive_ta.setText(c_receive_ta.getText() + "ACTION: Directory " + chooser.getSelectedFile() + " is selected!\n");
+					c_receive_ta.setText(c_receive_ta.getText() + "SERVER ACTION: Directory " + chooser.getSelectedFile() + " of " + cur_name + " is selected!\nSERVER ACTION: Server will start monitoring...\n");
 
-					System.out.println("pathDirectory5: " + chooser.getSelectedFile());
-
-
-					JFrame d_selected = new JFrame("View Selected Directory");
+					JFrame d_selected = new JFrame("View Selected Directory of "+ cur_name);
 
 					d_selected.setResizable(true);
 					d_selected.setLocation(width / 2, height / 2);
@@ -304,26 +305,6 @@ public class Server implements ItemListener {
 							String name = connectToClient();
 							if(name!=null){
 								l_model.addElement(name);
-
-								new Thread(new Runnable() {
-									public void run(){
-										while (clientList.get(name).checkConnection()){
-											try{
-												String rm = clientList.get(name).manageClient();
-												
-												if (rm == null){
-													l_model.removeElement(name);
-													confirmed.setVisible(false);
-													clientList.get(name).setConnection(false);
-												}else{
-													c_receive_ta.setText(c_receive_ta.getText() + name + ": " + rm + "\n");
-												}
-											}catch(IOException | ClassNotFoundException e){
-												e.printStackTrace();
-											}
-										}
-									}
-								}).start();
 							}
 						}
 						//<--
@@ -333,7 +314,7 @@ public class Server implements ItemListener {
 		});
 	}
 
-	public static void openServer() {
+	public void openServer() {
 		try {
 			ss = new ServerSocket(PORT);
 		} catch (IOException e) {
@@ -341,7 +322,7 @@ public class Server implements ItemListener {
 		}
 	}
 	
-	public static String connectToClient(){
+	public String connectToClient(){
 		try{
 			Socket s = ss.accept(); // synchronous
 			String name = "client" + String.valueOf(s.getPort());
@@ -361,7 +342,120 @@ public class Server implements ItemListener {
 		}
 	}
 
-	public static ClientThread chooseClient(String name) {
-		return clientList.get(name);
+	public class ClientThread implements Runnable {
+		private String name;
+		private int port;
+		private Socket s;
+		
+		private static boolean connecting = false;
+		public static Thread t;
+		public static File selectedDirectory;
+		public static JTree tree = null;
+	
+		private BufferedReader br;
+		private BufferedWriter bw;
+	
+		ClientThread(String name, int port, Socket s) {
+			this.name = name;
+			this.port = port;
+			this.s = s;
+			t = new Thread(this, name);
+		}
+	
+		public void startClient() {
+			connecting = true;
+			t.start();
+		}
+	
+		public JTree myTree() {
+			return tree;
+		}
+	
+		public void setConnection(boolean check) {
+			connecting = check;
+		}
+	
+		public void setDirectory(File directory) {
+			selectedDirectory = directory;
+		}
+	
+		public void run() {
+			try {
+				br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+				bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	
+			while (connecting) {
+				try{
+					String rm = clientList.get(name).manageClient();
+					
+					if (rm == null){
+						l_model.removeElement(name);
+						confirmed.setVisible(false);
+						clientList.get(name).setConnection(false);
+					}else{
+						c_receive_ta.setText(c_receive_ta.getText() + name + ": " + rm + "\n");
+					}
+				}catch(IOException | ClassNotFoundException e){
+					e.printStackTrace();
+				}
+			}
+	
+			try {
+				br.close();
+				bw.close();
+				s.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	
+		public String manageClient() throws IOException, ClassNotFoundException{
+			String rm = receiveFromClient();
+			if (rm == null || rm.equals("CLIENT_DISCONNECT")) {
+				setConnection(false);
+				return null;
+			} else {
+				return rm;
+			}
+		}
+	
+		public boolean sendToClient(String message) {
+			try {
+				String sentMessage = message;
+	
+				bw.write(sentMessage);
+				bw.newLine();
+				bw.flush();
+	
+				return true;
+			} catch (IOException e) {
+				return false;
+			}
+		}
+	
+		public String receiveFromClient() throws IOException, ClassNotFoundException {
+			try {
+				String receivedMessage = br.readLine();
+				if (receivedMessage.equals("SELECTED_DIRECTORY")){
+					//receive dir tree from client
+					//receiveDirectory();
+	
+					System.out.println("pathDirectory4: " + selectedDirectory);
+					return "SELECTED_DIRECTORY";           
+				}
+				return receivedMessage;
+			} catch (IOException e) {
+				return null;
+			}
+		}
+	
+		public void receiveDirectory() throws IOException, ClassNotFoundException { // wip
+			ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
+			tree = (JTree)ois.readObject();
+			System.out.println("tree: " + tree);
+		}
 	}
 }
