@@ -31,6 +31,46 @@ class FileBrowser {
     private JTree tree;
     private DefaultTreeModel treeModel;
 
+    public JTree getPreciseTree(File directory) {
+        fileSystemView = FileSystemView.getFileSystemView();
+
+        // the File tree
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(directory);
+        treeModel = new DefaultTreeModel(root);
+
+        TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent tse){
+                DefaultMutableTreeNode node =
+                    (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
+                showChildren(node);
+            }
+        };
+
+        // show the file system roots.
+        File[] roots = fileSystemView.getFiles(directory, false);
+        for (File fileSystemRoot : roots) {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
+            root.add(node);
+            File[] files = fileSystemView.getFiles(fileSystemRoot, true);
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    node.add(new DefaultMutableTreeNode(file));
+                }
+            }
+            //
+        }
+
+        tree = new JTree(treeModel);
+        tree.setRootVisible(false);
+        tree.addTreeSelectionListener(treeSelectionListener);
+        tree.setCellRenderer(new FileTreeCellRenderer());
+        tree.expandRow(0);
+
+        tree.setVisibleRowCount(15);
+
+        return tree;
+    }
+
     public JTree getTree() {
         fileSystemView = FileSystemView.getFileSystemView();
 

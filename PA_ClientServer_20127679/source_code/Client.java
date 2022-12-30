@@ -7,7 +7,7 @@ import javax.swing.*;
 public class Client implements ItemListener {
 	static final int PORT = 3200;
 
-	private static String pathDirectory = "";
+	private static String pathDirectory;
 
 	private Socket s;
 	private Client c;
@@ -19,7 +19,7 @@ public class Client implements ItemListener {
 
 	private static JFrame noti = new JFrame("Notification from Client");
 
-	Client(){
+	Client() {
 		c = this;
 	}
 
@@ -30,7 +30,6 @@ public class Client implements ItemListener {
 	public boolean checkConnection() {
 		return connecting;
 	}
-
 
 	public static void main(String args[]) throws IOException {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -62,10 +61,10 @@ public class Client implements ItemListener {
 	}
 
 	public void addComponentToPane(Container pane) {
-			// CardLayout
+		// CardLayout
 		JPanel cards = new JPanel(new CardLayout());
 
-			// card: CONNECT
+		// card: CONNECT
 		// button
 		JPanel connect = new JPanel();
 		JButton connect_btn = new JButton("CONNECT");
@@ -74,22 +73,21 @@ public class Client implements ItemListener {
 
 		cards.add(connect, "connect");
 
-			// card: CONNECTED
+		// card: CONNECTED
 		JPanel connected = new JPanel();
-			
-		//connected: sendMessage panel
+
+		// connected: sendMessage panel
 		JPanel sendMessage = new JPanel();
 		JTextField sendMessage_tf = new JTextField(15);
-		sendMessage_tf.setMaximumSize(new Dimension(200,30));
+		sendMessage_tf.setMaximumSize(new Dimension(200, 30));
 		sendMessage.add(sendMessage_tf);
 
 		JButton sendMessage_btn = new JButton("SEND");
 		sendMessage_btn.setMaximumSize(new Dimension(200, 50));
 		sendMessage.add(sendMessage_btn);
 
-
-		//connected: receive label
-		JTextArea receiveMessage_ta = new JTextArea(10,10);
+		// connected: receive label
+		JTextArea receiveMessage_ta = new JTextArea(10, 10);
 		receiveMessage_ta.setLineWrap(true);
 		receiveMessage_ta.setWrapStyleWord(true);
 		receiveMessage_ta.setEditable(false);
@@ -97,10 +95,10 @@ public class Client implements ItemListener {
 
 		JScrollPane receiveMessage = new JScrollPane(receiveMessage_ta);
 
-		//connected: button
+		// connected: button
 		JButton disconnect_btn = new JButton("DISCONNECT");
 		disconnect_btn.setMaximumSize(new Dimension(200, 50));
-		
+
 		disconnect_btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -113,25 +111,24 @@ public class Client implements ItemListener {
 		connected.add(sendMessage);
 		connected.add(receiveMessage);
 		connected.add(disconnect_btn);
-        connected.setLayout(new BoxLayout(connected, BoxLayout.Y_AXIS));
+		connected.setLayout(new BoxLayout(connected, BoxLayout.Y_AXIS));
 
 		cards.add(connected, "connected");
 
 		pane.add(cards, BorderLayout.SOUTH);
 
-
 		// override buttons
-		
+
 		sendMessage_btn.addActionListener(new ActionListener() {
-            @Override
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String sm = sendMessage_tf.getText();
 
-				if (sm.equals("")) 
+				if (sm.equals(""))
 					return;
 
-				if (sendToServer(sm)){
-					receiveMessage_ta.setText(receiveMessage_ta.getText()+"Client: "+sm+"\n");
+				if (sendToServer(sm)) {
+					receiveMessage_ta.setText(receiveMessage_ta.getText() + "Client: " + sm + "\n");
 				}
 			}
 		});
@@ -145,27 +142,27 @@ public class Client implements ItemListener {
 					CardLayout cl = (CardLayout) (cards.getLayout());
 					cl.show(cards, "connected");
 
-					JOptionPane.showMessageDialog(noti, "Connected to server! (OwO )", "Client", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(noti, "Connected to server! (OwO )", "Client",
+							JOptionPane.INFORMATION_MESSAGE);
 
 					new Thread(new Runnable() {
 						public void run() {
-							while (connecting){
-								if(s.isClosed()||s==null){
+							while (connecting) {
+								if (s == null || s.isClosed()) {
 									connecting = false;
 									break;
 								}
 								String rm = receiveFromServer();
-								if(!rm.equals("SELECTED_DIRECTORY")){
-									if(!rm.equals("") && rm != null){
-										receiveMessage_ta.setText(receiveMessage_ta.getText()+"Server: "+rm+"\n");
-									}
-									else {
-										connecting = false;
-										break;
-									}
+								if (rm == null || rm.equals("")) {
+									connecting = false;
+									break;
+								}
+								else if (!rm.equals("SELECTED_DIRECTORY")) {
+									receiveMessage_ta.setText(receiveMessage_ta.getText() + "Server: " + rm + "\n");
 								}
 							}
-							JOptionPane.showMessageDialog(noti, "Disconnected from server! (OwO )", "Client", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(noti, "Disconnected from server! (OwO )", "Client",
+									JOptionPane.INFORMATION_MESSAGE);
 							CardLayout cl = (CardLayout) (cards.getLayout());
 							cl.show(cards, "connect");
 						}
@@ -179,7 +176,7 @@ public class Client implements ItemListener {
 		try {
 			// initialize variables
 			// server's socket and IO streams
-			if (s != null){
+			if (s != null) {
 				s.close();
 			}
 
@@ -192,7 +189,8 @@ public class Client implements ItemListener {
 
 			return true;
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(noti, "Server unavailable! <0A0 >", "Client", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(noti, "Server unavailable! <0A0 >", "Client",
+					JOptionPane.INFORMATION_MESSAGE);
 			return false;
 		}
 	}
@@ -225,30 +223,50 @@ public class Client implements ItemListener {
 	public String receiveFromServer() { //
 		try {
 			String receivedMessage = br.readLine();
-			if (receivedMessage.equals("SELECTED_DIRECTORY")){
+			if (receivedMessage == null)
+				return null;
+			if (receivedMessage.equals("SELECTED_DIRECTORY")) {
 				String tempPathDirectory = br.readLine();
-				if (!tempPathDirectory.equals(pathDirectory)){
+				// File tempPathDirectory = oos.readObject();
+				if (!tempPathDirectory.equals(pathDirectory)) {
 					pathDirectory = tempPathDirectory;
-					//send dir tree to server
+
+					// send dir tree to server
 					sendDirectoryTree();
-					
-					//send notifications to server
+
+					// send notifications to server
 					new Thread(new ClientFile(c)).start();
 
-					System.out.println("pathDirectory: "+ pathDirectory);
+					System.out.println("pathDirectory1: " + pathDirectory);
 				}
+				return "SELECTED_DIRECTORY";
 			}
 			return receivedMessage;
 		} catch (IOException e) {
-			return "";
+			return null;
 		}
 	}
 
 	public void sendDirectoryTree() throws IOException {
-        JTree model = new FileBrowser().getTree();
+		JTree model = new FileBrowser().getTree();
+		//JTree model = new FileBrowser().getPreciseTree(pathDirectory);
+		
+		// // JFrame d_selected = new JFrame("Client: View Directory");
 
-        sendToServer("SELECTED_DIRECTORY");
-        ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-        oos.writeObject(model);
-    }
+		// // d_selected.setResizable(true);
+		
+		// // JPanel d_selected_panel = new JPanel();
+		// // d_selected_panel.add(model);
+		// // d_selected.add(d_selected_panel);
+		
+		// // d_selected.pack();
+		// // d_selected.setVisible(connecting);
+		
+		// sendToServer("SELECTED_DIRECTORY");
+
+		// ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+		// oos.writeObject(model);
+		// oos.flush();
+		// System.out.println("pathDirectory2: " + pathDirectory);
+	}
 }

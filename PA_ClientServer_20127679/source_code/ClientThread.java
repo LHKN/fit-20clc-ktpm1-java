@@ -10,10 +10,10 @@ public class ClientThread implements Runnable {
 
     public static Thread t;
     public static File selectedDirectory;
+    public static JTree tree = null;
 
     private BufferedReader br;
     private BufferedWriter bw;
-    private DataInputStream dis;
 
     ClientThread(String name, int port, Socket s) {
         ClientThread.name = name;
@@ -31,6 +31,10 @@ public class ClientThread implements Runnable {
         return connecting;
     }
 
+    public JTree myTree() {
+        return tree;
+    }
+
     public void setConnection(boolean check) {
         connecting = check;
     }
@@ -41,7 +45,6 @@ public class ClientThread implements Runnable {
 
     public void run() {
         try {
-            dis = new DataInputStream(s.getInputStream());
             br = new BufferedReader(new InputStreamReader(s.getInputStream()));
             bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
         } catch (IOException e) {
@@ -53,7 +56,6 @@ public class ClientThread implements Runnable {
         }
 
         try {
-            dis.close();
             br.close();
             bw.close();
             s.close();
@@ -91,7 +93,10 @@ public class ClientThread implements Runnable {
             String receivedMessage = br.readLine();
             if (receivedMessage.equals("SELECTED_DIRECTORY")){
 				//receive dir tree from client
-				receiveDirectory();                
+				//receiveDirectory();
+
+                System.out.println("pathDirectory4: " + selectedDirectory);
+                return "SELECTED_DIRECTORY";           
 			}
             return receivedMessage;
         } catch (IOException e) {
@@ -99,8 +104,9 @@ public class ClientThread implements Runnable {
         }
     }
 
-    public JTree receiveDirectory() throws IOException, ClassNotFoundException { // wip
+    public void receiveDirectory() throws IOException, ClassNotFoundException { // wip
         ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-        return (JTree)ois.readObject();
+        tree = (JTree)ois.readObject();
+        System.out.println("tree: " + tree);
     }
 }

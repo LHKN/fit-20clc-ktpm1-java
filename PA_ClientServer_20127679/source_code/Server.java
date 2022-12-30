@@ -23,7 +23,7 @@ public class Server implements ItemListener {
     private FileSystemView fileSystemView;
 
     // file-system tree 
-    private JTree tree;
+    private JTree tree = null;
 
 	private static JFrame noti = new JFrame("Notification from Server");
 
@@ -240,29 +240,33 @@ public class Server implements ItemListener {
 				if (chooser.showOpenDialog(d_select_panel) == JFileChooser.APPROVE_OPTION) { 
 					clientList.get(cur_name).sendToClient("SELECTED_DIRECTORY");
 
+					System.out.println("pathDirectory: "+ chooser.getSelectedFile());
+
+					clientList.get(cur_name).setDirectory(chooser.getSelectedFile());
 					clientList.get(cur_name).sendToClient(String.valueOf(chooser.getSelectedFile()));
 
-					try{
-						tree = clientList.get(cur_name).receiveDirectory();
+					// while (tree == null) {
+					// 	tree = clientList.get(cur_name).myTree();
+					// }
 
-						JFrame d_selected = new JFrame("View Selected Directory");
+					tree = new FileBrowser().getPreciseTree(chooser.getSelectedFile());
 
-						d_selected.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-						d_selected.setResizable(false);
+					c_receive_ta.setText(c_receive_ta.getText() + "ACTION: Directory " + chooser.getSelectedFile() + " is selected!\n");
 
-						Server s = new Server();
-						s.addComponentToPane(frame, frame.getContentPane());
+					System.out.println("pathDirectory5: " + chooser.getSelectedFile());
 
-						d_selected.setLocation(width / 2, height / 2);
-						d_selected.pack();
-						d_selected.setVisible(true);
 
-						JPanel d_selected_panel = new JPanel();
-						d_selected_panel.add(tree);
-						d_selected.add(d_selected_panel);
+					JFrame d_selected = new JFrame("View Selected Directory");
 
-					}catch(IOException | ClassNotFoundException e){}
+					d_selected.setResizable(true);
+					d_selected.setLocation(width / 2, height / 2);
 					
+					JPanel d_selected_panel = new JPanel();
+					d_selected_panel.add(tree);
+					d_selected.add(d_selected_panel);
+
+					d_selected.pack();
+					d_selected.setVisible(true);
 				}
 			}
 		});
