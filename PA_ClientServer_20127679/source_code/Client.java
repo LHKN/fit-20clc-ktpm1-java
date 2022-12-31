@@ -7,7 +7,8 @@ import javax.swing.tree.*;
 import java.beans.XMLEncoder;
 
 public class Client implements ItemListener {
-	static final int PORT = 3200;
+	static final String HOST = "localhost"; // configurable
+	static final int PORT = 3200; // configurable
 
 	private static String selectedDirectory;
 
@@ -61,20 +62,19 @@ public class Client implements ItemListener {
 		c.addComponentToPane(frame.getContentPane());
 
 		frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent evt) {
-                try {
-                    if (connecting) {
-                        c.sendToServer("CLIENT_DISCONNECT");
-                        connecting = false;
-                        c.s.close();
-                    }
-                }
-                catch (IOException exc) {
-                    exc.printStackTrace();
-                }
-            } 
-        });
+			@Override
+			public void windowClosing(WindowEvent evt) {
+				try {
+					if (connecting) {
+						c.sendToServer("CLIENT_DISCONNECT");
+						connecting = false;
+						c.s.close();
+					}
+				} catch (IOException exc) {
+					exc.printStackTrace();
+				}
+			}
+		});
 
 		frame.pack();
 		frame.setVisible(true);
@@ -177,12 +177,10 @@ public class Client implements ItemListener {
 							while (connecting) {
 								String rm = receiveFromServer();
 								if (rm == null || rm.equals("")) {
-								}
-								else if(rm.equals("SERVER_DISCONNECT")) {
+								} else if (rm.equals("SERVER_DISCONNECT")) {
 									connecting = false;
 									break;
-								}
-								else if (!rm.equals("SELECTED_DIRECTORY")) {
+								} else if (!rm.equals("SELECTED_DIRECTORY")) {
 									receiveMessage_ta.setText(receiveMessage_ta.getText() + "Server: " + rm + "\n");
 								}
 							}
@@ -205,16 +203,14 @@ public class Client implements ItemListener {
 				s.close();
 			}
 
-			s = new Socket("localhost", PORT);
+			s = new Socket(HOST, PORT);
 
 			new Thread(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					try {
 						sendDirectoryTree();
-					}
-					catch(IOException e) {
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				}
@@ -255,7 +251,7 @@ public class Client implements ItemListener {
 		}
 	}
 
-	public String receiveFromServer() { //
+	public String receiveFromServer() {
 		try {
 			String receivedMessage = br.readLine();
 			if (receivedMessage == null)
@@ -266,7 +262,7 @@ public class Client implements ItemListener {
 					selectedDirectory = tempPathDirectory;
 
 					// send notifications to server
-					if (myFileThread!=null){
+					if (myFileThread != null) {
 						myFile = null;
 						myFileThread.interrupt();
 						myFileThread = null;
@@ -287,9 +283,9 @@ public class Client implements ItemListener {
 
 	public void sendDirectoryTree() throws IOException {
 		// DefaultTreeModel treeModel = (DefaultTreeModel) model.getModel();
-        // XMLEncoder encoder = new XMLEncoder(s.getOutputStream());
-        // encoder.writeObject(treeModel);
-        // encoder.flush();
+		// XMLEncoder encoder = new XMLEncoder(s.getOutputStream());
+		// encoder.writeObject(treeModel);
+		// encoder.flush();
 		// encoder.close();
 
 		System.out.println("sent directory tree ");

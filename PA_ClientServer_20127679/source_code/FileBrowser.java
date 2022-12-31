@@ -13,12 +13,13 @@ import java.util.List;
 
 import java.io.*;
 
-/**
-@author Andrew Thompson
-@version 2011-06-08
-@see http://codereview.stackexchange.com/q/4446/7784
-@license LGPL
-*/
+/** referencing the following author:
+ * https://codereview.stackexchange.com/questions/4446/file-browser-gui
+ * @author Andrew Thompson
+ * @version 2011-06-08
+ * @see http://codereview.stackexchange.com/q/4446/7784
+ * @license LGPL
+ */
 
 class FileBrowser {
     /** Provides nice icons and names for files. */
@@ -39,9 +40,8 @@ class FileBrowser {
         treeModel = new DefaultTreeModel(root);
 
         TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
-            public void valueChanged(TreeSelectionEvent tse){
-                DefaultMutableTreeNode node =
-                    (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
+            public void valueChanged(TreeSelectionEvent tse) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
                 showChildren(node);
             }
         };
@@ -79,9 +79,8 @@ class FileBrowser {
         treeModel = new DefaultTreeModel(root);
 
         TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
-            public void valueChanged(TreeSelectionEvent tse){
-                DefaultMutableTreeNode node =
-                    (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
+            public void valueChanged(TreeSelectionEvent tse) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
                 showChildren(node);
             }
         };
@@ -90,7 +89,7 @@ class FileBrowser {
         File[] roots = fileSystemView.getRoots();
         for (File fileSystemRoot : roots) {
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
-            root.add( node );
+            root.add(node);
             File[] files = fileSystemView.getFiles(fileSystemRoot, true);
             for (File file : files) {
                 if (file.isDirectory()) {
@@ -112,23 +111,22 @@ class FileBrowser {
     }
 
     public Container getGui() {
-        if (gui==null) {
-            gui = new JPanel(new BorderLayout(3,3));
-            gui.setBorder(new EmptyBorder(5,5,5,5));
+        if (gui == null) {
+            gui = new JPanel(new BorderLayout(3, 3));
+            gui.setBorder(new EmptyBorder(5, 5, 5, 5));
 
             tree = getTree();
             JScrollPane treeScroll = new JScrollPane(tree);
 
             Dimension preferredSize = treeScroll.getPreferredSize();
             Dimension widePreferred = new Dimension(
-                200,
-                (int)preferredSize.getHeight());
-            treeScroll.setPreferredSize( widePreferred );
-
+                    200,
+                    (int) preferredSize.getHeight());
+            treeScroll.setPreferredSize(widePreferred);
 
             gui.add(treeScroll, BorderLayout.CENTER);
 
-            JPanel simpleOutput = new JPanel(new BorderLayout(3,3));
+            JPanel simpleOutput = new JPanel(new BorderLayout(3, 3));
 
             gui.add(simpleOutput, BorderLayout.SOUTH);
         }
@@ -137,12 +135,13 @@ class FileBrowser {
 
     public void showRootFile() {
         // ensure the main files are displayed
-        tree.setSelectionInterval(0,0);
+        tree.setSelectionInterval(0, 0);
     }
 
-
-    /** Add the files that are contained within the directory of this node.
-    Thanks to Hovercraft Full Of Eels for the SwingWorker fix. */
+    /**
+     * Add the files that are contained within the directory of this node.
+     * Thanks to Hovercraft Full Of Eels for the SwingWorker fix.
+     */
     private void showChildren(final DefaultMutableTreeNode node) {
         tree.setEnabled(false);
 
@@ -151,7 +150,7 @@ class FileBrowser {
             public Void doInBackground() {
                 File file = (File) node.getUserObject();
                 if (file.isDirectory()) {
-                    File[] files = fileSystemView.getFiles(file, true); //!!
+                    File[] files = fileSystemView.getFiles(file, true); // !!
                     if (node.isLeaf()) {
                         for (File child : files) {
                             if (child.isDirectory()) {
@@ -185,7 +184,7 @@ class FileBrowser {
                     // Significantly improves the look of the output in
                     // terms of the file names returned by FileSystemView!
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch(Exception weTried) {
+                } catch (Exception weTried) {
                 }
                 JFrame f = new JFrame("APP_TITLE");
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -219,16 +218,16 @@ class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(
-        JTree tree,
-        Object value,
-        boolean selected,
-        boolean expanded,
-        boolean leaf,
-        int row,
-        boolean hasFocus) {
+            JTree tree,
+            Object value,
+            boolean selected,
+            boolean expanded,
+            boolean leaf,
+            int row,
+            boolean hasFocus) {
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-        File file = (File)node.getUserObject();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+        File file = (File) node.getUserObject();
         label.setIcon(fileSystemView.getSystemIcon(file));
         label.setText(fileSystemView.getSystemDisplayName(file));
         label.setToolTipText(file.getPath());
