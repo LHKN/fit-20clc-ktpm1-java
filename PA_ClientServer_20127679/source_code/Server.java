@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.filechooser.FileSystemView;
-
+import java.beans.XMLDecoder;
 
 public class Server implements ItemListener {
 	static final int PORT = 3200;
@@ -23,7 +23,7 @@ public class Server implements ItemListener {
     private FileSystemView fileSystemView;
 
     // file-system tree 
-    private JTree tree = null;
+    private JTree tree;
 	private static JTextArea c_receive_ta;
 	private static DefaultListModel<String> l_model;
 	private static JPanel confirmed;
@@ -32,6 +32,7 @@ public class Server implements ItemListener {
 
 	Server() {
 		clientList = new HashMap<>();
+		tree = new JTree();
 	}
 
 	public static void main(String args[]) {
@@ -59,6 +60,17 @@ public class Server implements ItemListener {
 
 		Server s = new Server();
 		s.addComponentToPane(frame, frame.getContentPane());
+
+		frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent evt) {
+                //Send server disconnect command
+                for (String s: clientList.keySet()) {
+					ClientThread clh = clientList.get(s);
+					clh.sendToClient("SERVER_DISCONNECT");
+				}
+            } 
+        });
 
 		frame.setLocation(width / 2, 0);
 		frame.pack();
@@ -148,7 +160,7 @@ public class Server implements ItemListener {
 		c_receive_ta.setLineWrap(true);
 		c_receive_ta.setWrapStyleWord(true);
 		c_receive_ta.setEditable(false);
-		c_receive_ta.setText("WELCOME TO SERVER CHAT\n");
+		c_receive_ta.setText("WELCOME TO SERVER CHAT\n\n");
 
 		JScrollPane chat_receiveMessage = new JScrollPane(c_receive_ta);
 
@@ -202,7 +214,7 @@ public class Server implements ItemListener {
 
 				cur_name = temp;
 
-				System.out.println("Connected to client "+cur_name);///
+				c_receive_ta.setText(c_receive_ta.getText()+"SERVER ACTION: Server has selected "+ cur_name+"! Server can send messages to them or monitor their directory!\n");
 
 				confirmed.setVisible(true);
 				frame.pack();
@@ -233,7 +245,11 @@ public class Server implements ItemListener {
 			@Override
             public void actionPerformed(ActionEvent arg0) {		
 				JFileChooser chooser = new JFileChooser(); 
+				//chooser.setCurrentDirectory((File)clientList.get(cur_name).myTree().getSelectionPath().getLastPathComponent());
+
+				//TEMP TREE for debugging
 				chooser.setCurrentDirectory(new java.io.File("."));
+
 				chooser.setDialogTitle("Select Directory");
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				//
@@ -246,11 +262,7 @@ public class Server implements ItemListener {
 					clientList.get(cur_name).setDirectory(chooser.getSelectedFile());
 					clientList.get(cur_name).sendToClient(String.valueOf(chooser.getSelectedFile()));
 
-					//c_receive_ta.setText(c_receive_ta.getText() + "SERVER ACTION: Loading directory " + chooser.getSelectedFile() + " of " + cur_name + "...\n");
-
-					// while (tree == null) {
-					// 	tree = clientList.get(cur_name).myTree();
-					// }
+					c_receive_ta.setText(c_receive_ta.getText() + "SERVER ACTION: Loading directory " + chooser.getSelectedFile() + " of " + cur_name + "...\n");
 
 					// TEMP TREE for debugging purposes
 					tree = new FileBrowser().getPreciseTree(chooser.getSelectedFile());
@@ -284,7 +296,6 @@ public class Server implements ItemListener {
 				if(clientList.get(cur_name).sendToClient(sm)){
 					c_receive_ta.setText(c_receive_ta.getText()+"Server: "+sm+"\n");
 				}else{
-					JOptionPane.showMessageDialog(noti, "Client has left! <0A0 >", "Server", JOptionPane.INFORMATION_MESSAGE);
 					clientList.get(cur_name).setConnection(false);
 				}
 			}
@@ -306,6 +317,11 @@ public class Server implements ItemListener {
 							if(name!=null){
 								l_model.addElement(name);
 							}
+
+							if(l_model.toArray().length==0){
+								CardLayout cl = (CardLayout) (states.getLayout());
+								cl.show(states, "connect");
+							}
 						}
 						//<--
 					}
@@ -318,7 +334,7 @@ public class Server implements ItemListener {
 		try {
 			ss = new ServerSocket(PORT);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(noti, "Connection is interrupted! <0A0 >", "Server", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(noti, "Unavailable port! <0A0 >", "Server", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 	
@@ -329,12 +345,9 @@ public class Server implements ItemListener {
 	
 			System.out.println("Accepting client");
 			System.out.println(name);
-	
-			//if (!clientList.keySet().contains(name)) {
-				ClientThread ct = new ClientThread(name,s.getPort(),s);
-				clientList.put(name, ct);
-				ct.startClient();
-			//}
+			
+			ClientThread ct = new ClientThread(name,s.getPort(),s);
+			clientList.put(name, ct);
 
 			return name;
 		} catch (IOException e) {
@@ -348,9 +361,9 @@ public class Server implements ItemListener {
 		private Socket s;
 		
 		private static boolean connecting = false;
-		public static Thread t;
-		public static File selectedDirectory;
-		public static JTree tree = null;
+		private static Thread t;
+		private static File selectedDirectory;
+		private static JTree tree;
 	
 		private BufferedReader br;
 		private BufferedWriter bw;
@@ -359,13 +372,32 @@ public class Server implements ItemListener {
 			this.name = name;
 			this.port = port;
 			this.s = s;
+			tree = new JTree();
+			try{
+				receiveDirectory();
+			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 			t = new Thread(this, name);
+			startClient();
 		}
 	
 		public void startClient() {
 			connecting = true;
 			t.start();
 		}
+
+		public void endClient() {
+            if (this.s != null) {
+                try {
+                    this.s.close();
+                    this.s = null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+			t.interrupt();
+        }
 	
 		public JTree myTree() {
 			return tree;
@@ -373,6 +405,10 @@ public class Server implements ItemListener {
 	
 		public void setConnection(boolean check) {
 			connecting = check;
+		}
+
+		public boolean getConnection() {
+			return connecting;
 		}
 	
 		public void setDirectory(File directory) {
@@ -389,36 +425,25 @@ public class Server implements ItemListener {
 	
 			while (connecting) {
 				try{
-					String rm = clientList.get(name).manageClient();
+					String rm = clientList.get(name).receiveFromClient();
 					
 					if (rm == null){
+					}
+					else if (rm.equals("CLIENT_DISCONNECT")){
+						clientList.remove(name);
 						l_model.removeElement(name);
-						confirmed.setVisible(false);
-						clientList.get(name).setConnection(false);
-					}else{
+						connecting = false;
+						if(cur_name.equals(this.name)){
+							confirmed.setVisible(false);
+						}
+						endClient();
+					}
+					else if (!rm.equals("")){
 						c_receive_ta.setText(c_receive_ta.getText() + name + ": " + rm + "\n");
 					}
 				}catch(IOException | ClassNotFoundException e){
 					e.printStackTrace();
 				}
-			}
-	
-			try {
-				br.close();
-				bw.close();
-				s.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	
-		public String manageClient() throws IOException, ClassNotFoundException{
-			String rm = receiveFromClient();
-			if (rm == null || rm.equals("CLIENT_DISCONNECT")) {
-				setConnection(false);
-				return null;
-			} else {
-				return rm;
 			}
 		}
 	
@@ -432,6 +457,7 @@ public class Server implements ItemListener {
 	
 				return true;
 			} catch (IOException e) {
+				//connecting = false;
 				return false;
 			}
 		}
@@ -439,23 +465,25 @@ public class Server implements ItemListener {
 		public String receiveFromClient() throws IOException, ClassNotFoundException {
 			try {
 				String receivedMessage = br.readLine();
-				if (receivedMessage.equals("SELECTED_DIRECTORY")){
-					//receive dir tree from client
-					//receiveDirectory();
-	
-					System.out.println("pathDirectory4: " + selectedDirectory);
-					return "SELECTED_DIRECTORY";           
+
+				if (receivedMessage == null){
+					return null;
 				}
+				else if (receivedMessage.equals("CLIENT_DISCONNECT")) {
+					setConnection(false);
+				}
+
 				return receivedMessage;
 			} catch (IOException e) {
+				//connecting = false;
 				return null;
 			}
 		}
 	
 		public void receiveDirectory() throws IOException, ClassNotFoundException { // wip
-			ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-			tree = (JTree)ois.readObject();
-			System.out.println("tree: " + tree);
+			// XMLDecoder decoder = new XMLDecoder(s.getInputStream());
+			// tree.setModel((DefaultTreeModel)decoder.readObject());
+			// decoder.close();
 		}
 	}
 }

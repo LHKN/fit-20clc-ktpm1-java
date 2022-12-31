@@ -3,7 +3,7 @@ import java.io.*;
 import java.net.Socket;
 
 public class ClientFile implements Runnable {
-    public static WatchService ws;
+    private static WatchService ws;
 
     private static Client c;
 

@@ -3,29 +3,37 @@ import java.net.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.tree.*;
+import java.beans.XMLEncoder;
 
 public class Client implements ItemListener {
 	static final int PORT = 3200;
 
-	private static String pathDirectory;
+	private static String selectedDirectory;
 
 	private Socket s;
 	private Client c;
-	private boolean connecting = false;
+	private static boolean connecting;
+	private Thread myFileThread;
+	private ClientFile myFile;
 
 	private BufferedReader br;
 	private BufferedWriter bw;
-	private DataOutputStream dos;
 
-	private static JFrame noti = new JFrame("Notification from Client");
+	private static JFrame noti;
 	private static JTextArea receiveMessage_ta;
+	private JPanel sendMessage;
+	private JTree model;
 
 	Client() {
 		c = this;
+		connecting = false;
+		noti = new JFrame("Notification from Client");
+		model = new FileBrowser().getTree();
 	}
 
 	public String getDirectory() {
-		return pathDirectory;
+		return selectedDirectory;
 	}
 
 	public boolean checkConnection() {
@@ -51,6 +59,22 @@ public class Client implements ItemListener {
 
 		Client c = new Client();
 		c.addComponentToPane(frame.getContentPane());
+
+		frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent evt) {
+                try {
+                    if (connecting) {
+                        c.sendToServer("CLIENT_DISCONNECT");
+                        connecting = false;
+                        c.s.close();
+                    }
+                }
+                catch (IOException exc) {
+                    exc.printStackTrace();
+                }
+            } 
+        });
 
 		frame.pack();
 		frame.setVisible(true);
@@ -78,7 +102,7 @@ public class Client implements ItemListener {
 		JPanel connected = new JPanel();
 
 		// connected: sendMessage panel
-		JPanel sendMessage = new JPanel();
+		sendMessage = new JPanel();
 		JTextField sendMessage_tf = new JTextField(15);
 		sendMessage_tf.setMaximumSize(new Dimension(200, 30));
 		sendMessage.add(sendMessage_tf);
@@ -87,12 +111,14 @@ public class Client implements ItemListener {
 		sendMessage_btn.setMaximumSize(new Dimension(200, 50));
 		sendMessage.add(sendMessage_btn);
 
+		// sendMessage.setVisible(false);
+
 		// connected: receive label
 		receiveMessage_ta = new JTextArea(10, 10);
 		receiveMessage_ta.setLineWrap(true);
 		receiveMessage_ta.setWrapStyleWord(true);
 		receiveMessage_ta.setEditable(false);
-		receiveMessage_ta.setText("WELCOME TO SERVER CHAT\n");
+		receiveMessage_ta.setText("WELCOME TO SERVER CHAT\n\n");
 
 		JScrollPane receiveMessage = new JScrollPane(receiveMessage_ta);
 
@@ -149,12 +175,10 @@ public class Client implements ItemListener {
 					new Thread(new Runnable() {
 						public void run() {
 							while (connecting) {
-								if (s == null || s.isClosed()) {
-									connecting = false;
-									break;
-								}
 								String rm = receiveFromServer();
 								if (rm == null || rm.equals("")) {
+								}
+								else if(rm.equals("SERVER_DISCONNECT")) {
 									connecting = false;
 									break;
 								}
@@ -183,9 +207,20 @@ public class Client implements ItemListener {
 
 			s = new Socket("localhost", PORT);
 
-			br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+			new Thread(new Runnable() {
+				@Override
+				public void run()
+				{
+					try {
+						sendDirectoryTree();
+					}
+					catch(IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
 
-			dos = new DataOutputStream(s.getOutputStream());
+			br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 
 			return true;
@@ -200,7 +235,6 @@ public class Client implements ItemListener {
 		c.sendToServer("CLIENT_DISCONNECT");
 
 		try {
-			dos.close();
 			bw.close();
 			br.close();
 			s.close();
@@ -228,17 +262,20 @@ public class Client implements ItemListener {
 				return null;
 			if (receivedMessage.equals("SELECTED_DIRECTORY")) {
 				String tempPathDirectory = br.readLine();
-				// File tempPathDirectory = oos.readObject();
-				if (!tempPathDirectory.equals(pathDirectory)) {
-					pathDirectory = tempPathDirectory;
-
-					// send dir tree to server
-					sendDirectoryTree();
+				if (!tempPathDirectory.equals(selectedDirectory)) {
+					selectedDirectory = tempPathDirectory;
 
 					// send notifications to server
-					new Thread(new ClientFile(c)).start();
+					if (myFileThread!=null){
+						myFile = null;
+						myFileThread.interrupt();
+						myFileThread = null;
+					}
+					myFile = new ClientFile(c);
+					myFileThread = new Thread(myFile);
+					myFileThread.start();
 
-					System.out.println("pathDirectory1: " + pathDirectory);
+					System.out.println("selected directory: " + selectedDirectory);
 				}
 				return "SELECTED_DIRECTORY";
 			}
@@ -249,25 +286,13 @@ public class Client implements ItemListener {
 	}
 
 	public void sendDirectoryTree() throws IOException {
-		JTree model = new FileBrowser().getTree();
-		//JTree model = new FileBrowser().getPreciseTree(pathDirectory);
-		
-		// // JFrame d_selected = new JFrame("Client: View Directory");
+		// DefaultTreeModel treeModel = (DefaultTreeModel) model.getModel();
+        // XMLEncoder encoder = new XMLEncoder(s.getOutputStream());
+        // encoder.writeObject(treeModel);
+        // encoder.flush();
+		// encoder.close();
 
-		// // d_selected.setResizable(true);
-		
-		// // JPanel d_selected_panel = new JPanel();
-		// // d_selected_panel.add(model);
-		// // d_selected.add(d_selected_panel);
-		
-		// // d_selected.pack();
-		// // d_selected.setVisible(connecting);
-		
-		// sendToServer("SELECTED_DIRECTORY");
-
-		// ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-		// oos.writeObject(model);
-		// oos.flush();
-		// System.out.println("pathDirectory2: " + pathDirectory);
+		System.out.println("sent directory tree ");
+		// sendMessage.setVisible(true);
 	}
 }
