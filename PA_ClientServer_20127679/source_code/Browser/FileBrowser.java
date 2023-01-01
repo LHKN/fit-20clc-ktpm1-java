@@ -1,3 +1,5 @@
+package Browser;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Container;
@@ -21,7 +23,7 @@ import java.io.*;
  * @license LGPL
  */
 
-class FileBrowser {
+public class FileBrowser {
     /** Provides nice icons and names for files. */
     private FileSystemView fileSystemView;
 
